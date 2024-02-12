@@ -104,7 +104,7 @@ kiosko.addProduct("Alfajor Terrabussi", "Alfajor bañado en chocolate relleno de
 
 
 
-// Llamado a "addProduct()" con campos vacios o en blanco. Los mismos son obligatorios, por lo que se arroja un error
+// Llamado a "addProduct()" con campos vacios o en blanco. Los mismos son obligatorios, por lo que se arroja un error.
 kiosko.addProduct("Gomitas Mogul", " ", 300, "URL/Gomitas Mogul", 20)
 
 
