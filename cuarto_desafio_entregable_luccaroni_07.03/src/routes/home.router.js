@@ -12,15 +12,26 @@ router.get("/", async(req, res) =>{
     try{
         await productManager.initialize()
         const products = await productManager.readProductsFromFile()
+        const productsData = products.map(p => ({
+            title: p.title,
+            thumbnail: p.thumbnail,
+            description: p.description,
+            price: p.price,
+            stock: p.stock,
+            code: p.code
+        }))
         
         res.render("home", {
-            title: "TEST!",
-            products
+            title: "Home",
+            products: productsData,
+            styles: ["home.css"]
+
         })
 
     }
     catch(err){
         console.log("ERROR DEL GET - HOME.ROUTER.JS => " + err)
+        res.status(500).send("Error interno del servidor.")
     }
 
 })

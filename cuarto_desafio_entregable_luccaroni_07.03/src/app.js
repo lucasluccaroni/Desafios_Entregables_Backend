@@ -15,7 +15,7 @@ app.set("view engine", "handlebars")
  
 //establezco las rutas de routes
 const realTimeProducts = require("./routes/realTimeProducts.route")
-const viewRouter = require("./routes/home.router")
+const homeRouter = require("./routes/home.router")
 
 //configuracion de express permitir envio de info mediante forms y JSON
 
@@ -23,7 +23,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
 //conexion de las url con los routes
-app.use("/", viewRouter)
+app.use("/home", homeRouter)
 app.use("/realtimeproducts", realTimeProducts)
 
 app.use(express.static(`${__dirname}/../public`))

@@ -13,6 +13,11 @@
     {{{body}}}
 
 
+    {{!-- incluir Socket.io si es necesario --}}
+    {{#if useWs}}
+    <script src="/socket.io/socket.io.js"></script>
+    {{/if}}
+
     {{#each scripts}}
     <script src="/js/{{this}}"></script>
     {{/each}}

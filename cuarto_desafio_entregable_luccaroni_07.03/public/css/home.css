@@ -1,0 +1,13 @@
+.productsContainer{
+    border: solid black;
+    background-color: aqua;
+    width: fit-content;
+    display: flex;
+    align-items:center;
+    justify-content: space-evenly;
+}
+.oneProduct{
+    border: solid blue 1px;
+    margin: 5px;
+    padding: 5px;
+}

@@ -1,0 +1,50 @@
+<h1>Agregue su producto:</h1>
+<div class="formContainer">
+    <form class="form" method="post" action="/realtimeproducts">
+        <label for="inputText">Title
+            <input type="text" id="inputTitle">
+        </label>
+
+        <label for="">Description
+            <input type="text" id="inputDescription">
+        </label>
+
+        <label for="inputPrice">Price
+            <input type="number" id="inputPrice">        
+        </label>
+
+        <label for="inputImage">Image (type URL)
+            <input type="txt" id="inputImage">
+        </label>
+
+        <label for="inputCode">Code
+            <input type="text" id="inputCode">
+        </label>
+
+        <label for="inputCategory">Category
+            <input type="text" id="inputCategory">
+        </label>
+
+        <label for="statusTrue"> Status:
+            True: <input type="checkbox" id="statusTrue" value="true">
+            False: <input type="checkbox" id="statusFalse" value="false">
+        </label>
+
+        <button type="submit">Submit</button>
+    </form>
+
+</div>
+
+
+<h1> Real Time Products List </h1>
+<div class="productsContainer">
+    {{#each products}}
+    <div class="oneProduct">
+        <h2> {{title}} </h2>
+        <h3> Description: {{description}} </h3>
+        <h3> Price: {{price}} </h3>
+        <h4> Stock: {{stock}} </h4>
+        <h5> Code: {{code}} </h5>
+    </div>
+    {{/each}}
+</div>

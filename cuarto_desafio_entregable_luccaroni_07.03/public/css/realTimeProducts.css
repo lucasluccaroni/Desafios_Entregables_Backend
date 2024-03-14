@@ -1,0 +1,27 @@
+.productsContainer{
+    border: solid red;
+    background-color: bisque;
+    width: fit-content;
+    display: flex;
+    align-items:center;
+    justify-content: space-evenly;
+}
+.oneProduct{
+    border: solid  darkviolet 1px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.formContainer{
+    margin: 20px;
+    display: flex;
+    align-items: center;
+}
+.form{
+    width: fit-content;
+    height: 300px;
+    border: solid black;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+}
