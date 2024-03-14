@@ -24,6 +24,7 @@ router.get("/", async(_, res) =>{
         res.render("realTimeProducts", {
             title: "Real Time Products",
             products: productsData,
+            useWs: true,
             styles: ["realTimeProducts.css"]
 
         })
