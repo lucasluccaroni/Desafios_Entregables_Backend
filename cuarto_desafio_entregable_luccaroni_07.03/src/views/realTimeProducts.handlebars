@@ -1,50 +1,56 @@
 <h1>Agregue su producto:</h1>
 <div class="formContainer">
-    <form class="form" method="post" action="/realtimeproducts">
-        <label for="inputText">Title
-            <input type="text" id="inputTitle">
+    <form id="form" method="post" action="/realtimeproducts" enctype="application/x-www-form-urlencoded">
+        
+        <label for="inputTitle">Title
+            <input type="text" id="inputTitle" name="title">
         </label>
 
-        <label for="">Description
-            <input type="text" id="inputDescription">
+        <label for="inputDescription">Description 
+            <input type="text" id="inputDescription" name="description">
         </label>
 
         <label for="inputPrice">Price
-            <input type="number" id="inputPrice">        
+            <input type="number" id="inputPrice" name="price">        
         </label>
 
-        <label for="inputImage">Image (type URL)
-            <input type="txt" id="inputImage">
+        <label for="inputThumbnail">Thumbnail (type URL)
+            <input type="txt" id="inputThumbnail" name="thumbnail">
         </label>
 
         <label for="inputCode">Code
-            <input type="text" id="inputCode">
+            <input type="text" id="inputCode" name="code">
+        </label>
+
+         <label for="inputStock">Stock
+            <input type="number" id="inputStock" name="stock">
         </label>
 
         <label for="inputCategory">Category
-            <input type="text" id="inputCategory">
+            <input type="text" id="inputCategory" name="category">
         </label>
 
-        <label for="statusTrue"> Status:
-            True: <input type="checkbox" id="statusTrue" value="true">
-            False: <input type="checkbox" id="statusFalse" value="false">
+        <label for="inputStatus"> Status (write 'true' or 'false'):
+            <input type="text" id="inputStatus" name="status">
         </label>
 
-        <button type="submit">Submit</button>
+        <button type="submit" id="addProduct">Submit</button>
     </form>
 
 </div>
 
 
 <h1> Real Time Products List </h1>
-<div class="productsContainer">
+<div class="productsContainer" id="productBox">
     {{#each products}}
-    <div class="oneProduct">
+    <div class="oneProduct" id="oneProductDiv">
         <h2> {{title}} </h2>
         <h3> Description: {{description}} </h3>
         <h3> Price: {{price}} </h3>
-        <h4> Stock: {{stock}} </h4>
+        <h4> Category: {{category}} </h4>
+        <h5> Stock: {{stock}} </h5>
         <h5> Code: {{code}} </h5>
+        <h6> ID: {{id}} </h6>
     </div>
     {{/each}}
 </div>

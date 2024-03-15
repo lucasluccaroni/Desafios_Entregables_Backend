@@ -154,7 +154,7 @@ class ProductManager{
             thumbnail,
             code,
             stock,
-            status: true,
+            status,
             category
         }
 

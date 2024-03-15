@@ -1,12 +1,23 @@
 [
-    {
-        "title": "tesst",
-        "description": "test test.",
-        "price": 100,
-        "thumbnail": "URL/test",
-        "code": "abc005",
-        "stock": 100,
-        "status": true,
-        "category": "test"
-    }
+	{
+		"title": "tesst",
+		"description": "test test.",
+		"price": 100,
+		"thumbnail": "URL/test",
+		"code": "abc005",
+		"stock": 100,
+		"status": true,
+		"category": "test"
+	},
+	{
+		"id": 663,
+		"title": "prueba",
+		"description": "descprueba",
+		"price": "1200",
+		"thumbnail": "prueba/url",
+		"code": "asd236",
+		"stock": "51",
+		"status": "true",
+		"category": "prueba"
+	}
 ]

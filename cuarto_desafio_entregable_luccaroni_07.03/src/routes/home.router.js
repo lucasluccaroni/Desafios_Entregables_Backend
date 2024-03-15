@@ -8,7 +8,7 @@ const productManager = new ProductManager(filename)
 
 
 
-router.get("/", async(req, res) =>{
+router.get("/", async(_, res) =>{
     try{
         await productManager.initialize()
         const products = await productManager.readProductsFromFile()

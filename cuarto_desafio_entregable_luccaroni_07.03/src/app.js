@@ -32,10 +32,12 @@ app.use(express.static(`${__dirname}/../public`))
 //puerto
 const httpServer = app.listen(1303, ()=>{ console.log("Server ready.")})
 
+//servidor .io
 const wsServer = new Server(httpServer)
 app.set("ws", wsServer)
 
+
 wsServer.on("connection", (clientSocket) =>{
-    console.log("New client connected by WebSocket")
-    // agregar logica de websocket => pending
+    console.log(`New client connected by WebSocket, ID: ${clientSocket.id} `)
+    
 })
