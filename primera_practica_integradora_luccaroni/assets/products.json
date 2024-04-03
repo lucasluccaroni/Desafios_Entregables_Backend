@@ -1,0 +1,38 @@
+[
+	{
+		"id": "301",
+		"title": "Alfajor Havanna",
+		"description": "Alfajor sabor chocolate",
+		"price": 1000,
+		"thumbnail": "havanna.jpg",
+		"code": "abc015",
+		"stock": 100,
+		"status": true,
+		"category": "alfajores"
+	},
+	{
+		"id": "639",
+		"title": "Macritas",
+		"description": "Snack en forma de triangulo",
+		"price": 1200,
+		"thumbnail": "macritas.jpg",
+		"code": "abc016",
+		"stock": 200,
+		"status": true,
+		"category": "snacks"
+	},
+	{
+		"title": {
+			"title": "Gomitas Moul",
+			"description": "Gomitas comestibles sabor caramelo",
+			"price": 600,
+			"thumbnail": "mogul.jpg",
+			"code": "abc099",
+			"stock": 350,
+			"status": true,
+			"category": "golosinas"
+		},
+		"status": true,
+		"id": "340"
+	}
+]
