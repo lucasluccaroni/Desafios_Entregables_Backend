@@ -4,7 +4,10 @@ const User = require("../models/user.model")
 const { userIsAdmin } = require("../middlewares/auth.middleware")
 
 
+
+// LOGIN FORM
 router.post("/login", userIsAdmin,  async (req, res) =>{
+
 
     console.log("Informacion de usuario para login: ", req.body)
 
@@ -30,7 +33,7 @@ router.post("/login", userIsAdmin,  async (req, res) =>{
 })  
 
 
-
+// REGISTER FORM
 router.post("/register", async (req, res) => {
 
     console.log("Info del nuevo usuario", req.body)
@@ -55,7 +58,7 @@ router.post("/register", async (req, res) => {
     }
 })
 
-
+// LOGOUT
 router.get("/logout", (req, res) =>{
     req.session.destroy(_ =>{
         res.redirect("/")

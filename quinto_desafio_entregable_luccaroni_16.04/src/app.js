@@ -23,7 +23,7 @@ const handlebars = expressHandlebars.create({
     }
 })
 app.engine("handlebars", handlebars.engine)
-app.set("views" , `${__dirname}/views`)
+app.set("views", `${__dirname}/views`)
 app.set("view engine", "handlebars")
 
 
@@ -37,7 +37,7 @@ app.use("/", require("./routes/views.router"))
 
 const main = async () => {
 
-    await mongoose.connect(mongoUrl, { dbName }) 
+    await mongoose.connect(mongoUrl, { dbName })
 
     // creacion de nueva instancia prodcuctManager
     const productManager = new ProductManager()
@@ -49,7 +49,7 @@ const main = async () => {
     await cartManager.initialize()
     app.set("cartManager", cartManager)
 
-    app.listen(8080, () =>{
+    app.listen(8080, () => {
         console.log("Server OK!")
     })
 }

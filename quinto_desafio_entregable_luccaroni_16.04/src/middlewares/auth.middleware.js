@@ -17,34 +17,27 @@ module.exports = {
         next()
     },
 
-    admin: {
-        firstName: "admin",
-        lastName: "admin",
-        age: 100,
-        email: "adminCoder@coder.com",
-        password: "adminCod3r123",
-        _id: "1"
-    },
 
     userIsAdmin: (req, res, next) =>{
-        const admin = {
+
+        const adminData = {
             firstName: "admin",
             lastName: "admin",
             age: 100,
-            email: "adminCoder@coder.com",
-            password: "adminCod3r123",
+            email: "admin@admin.com",
+            password: "admin",
+            rol: "admin",
             _id: 1
         }
+        // Si es admin, lo autentifica y redirige a profile
+        if(req.body.email === adminData.email && req.body.password === adminData.password ) {
+            req.session.user = adminData
+            console.log("Bienvenido ADMIN")
+            return res.redirect("/profile")
+            }
 
-        if(req.body.email === admin.email && req.body.password === admin.password ){
-            req.session.user = {email: admin.email, _id: admin._id}
-            
-            res.send("Bienvenido ADMIN")
-            return true
-
-        }
-
+        // Si no es admin, continua con la autenticación normal
         next()
-    }
+    },    
 }
 

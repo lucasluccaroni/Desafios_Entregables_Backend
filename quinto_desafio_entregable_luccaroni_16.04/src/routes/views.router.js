@@ -1,10 +1,10 @@
 const { Router } = require("express")
 const router = Router()
 const User = require("../models/user.model")
-const { userIsLoggedIn, userIsNotLoggedIn, userIsAdmin, admin } = require("../middlewares/auth.middleware")
+const { userIsLoggedIn, userIsNotLoggedIn, } = require("../middlewares/auth.middleware")
 
 
-
+// HOME
 router.get("/", (req, res) => {
     console.log("Info de session en Home:" , req.session.user)
     const isLoggedIn = ![null, undefined].includes(req.session.user)
@@ -16,42 +16,56 @@ router.get("/", (req, res) => {
     })
 })
 
-
+// LOGIN
 router.get("/login", userIsNotLoggedIn, (req, res) => {
-    // To Do: Agregar midelware, solo se puede acceder si no está logueado - HECHO
+
     res.render("login", {
         Title: "Login"
     })
 })
 
-
-router.get("/register", userIsNotLoggedIn, (req, res) => {
-    // To Do: Agregar midelware, solo se puede acceder si no está logueado - HECHO
+// REGISTER
+router.get("/register", userIsNotLoggedIn,  (req, res) => {
 
     res.render("register", {
         title: "Register"
     })
 })
 
+// PROFILE
+router.get("/profile", userIsLoggedIn, async (req, res) => {
 
-router.get("/profile", userIsLoggedIn, userIsAdmin, async (req, res) => {
-    // To Do: Agregar middleware, solo se puede acceder si esta logueado - HECHO
-    // To Do: Mostrar los datos del usuario logeado, en vez de los fake - HECHO
+    console.log("Info de session en Profile: ", req.session.user)
     const idFromSession = req.session.user._id
-    // const { admin } = 
 
-    const user = await User.findOne(( {_id: idFromSession} ))
+    // Si tiene _id: 1 (porque es admin), importo los datos de admin y los renderizo.
+    if(idFromSession == 1){
+        const user = req.session.user
+        res.render("profile", {
+            title: "My Profile",
+            user:{
+                firstName: user.firstName,
+                lastName: user.lastName,
+                age: user.age,
+                email: user.email,
+                rol: user.rol
+            }
+        })
 
-    res.render("profile", {
-        title: "My Profile",
-        user:{
-            firstName: user.firstName,
-            lastName: user.lastName,
-            age: user.age,
-            email: user.email,
-            rol: user.rol
-        }
-    })
+    // Si el _id != 1 , busco en la DB el user, traigo sus datos y los renderizo.
+    } else {
+        const user = await User.findOne(( {_id: idFromSession} ))
+        res.render("profile", {
+            title: "My Profile",
+            user:{
+                firstName: user.firstName,
+                lastName: user.lastName,
+                age: user.age,
+                email: user.email,
+                rol: user.rol
+            }
+        })
+    }
 })
 
 

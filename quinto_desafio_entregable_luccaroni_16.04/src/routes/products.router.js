@@ -5,16 +5,12 @@ const User = require("../models/user.model")
 const router = Router()
 
 
-
-router.get("/", async (req, res) =>{
+// TODOS LOS PRODUCTOS
+router.get("/", async (req, res) => {
 
     try {
-        // info del user
-        const idFromSession = req.session.user._id
-        const user = await User.findOne(( {_id: idFromSession} ))
 
-
-        //products
+        //PRODUCTS
         const productManager = req.app.get("productManager")
         await productManager.initialize()
         let products = await productManager.getProducts()
@@ -22,16 +18,16 @@ router.get("/", async (req, res) =>{
 
         //queries
         const limit = req.query.limit || 10
-        const  page  = req.query.page || 1
+        const page = req.query.page || 1
         const sort = req.query.sort //asc o desc}
-        
+
         // category y stock(disponibilidad)
         let query = {}
-        if(req.query.category){
+        if (req.query.category) {
 
             query.category = req.query.category
 
-        } else if(req.query.stock){
+        } else if (req.query.stock) {
 
             query.stock = req.query.stock
         }
@@ -40,42 +36,67 @@ router.get("/", async (req, res) =>{
         products = await ProductModel.paginate(
             query,
             {
-                sort: sort && {price: sort}, //asc o desc
-                limit, 
-                page, 
+                sort: sort && { price: sort }, //asc o desc
+                limit,
+                page,
                 lean: true
             }
         )
-        
-        //console.log(products)
-        res.render("products", {
-            title: "Products!",
-            products,
-            user:{
-                firstName: user.firstName,
-                lastName: user.lastName,
-                age: user.age,
-                email: user.email,
-                rol: user.rol
-            }
-        })
 
-    } 
+
+
+        //USER
+        // info del user para renderizar
+        console.log("Info de session en Home:", req.session.user)
+        const idFromSession = req.session.user._id
+
+        // Si tiene _id: 1 (porque es admin), importo los datos de admin y los renderizo.
+        if (idFromSession == 1) {
+            const user = req.session.user
+            res.render("products", {
+                title: "Products!",
+                products,
+                user: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    age: user.age,
+                    email: user.email,
+                    rol: user.rol
+                }
+            })
+
+            // Si el _id != 1 , busco en la DB el user, traigo sus datos y los renderizo.
+        } else {
+            const user = await User.findOne(({ _id: idFromSession }))
+            res.render("products", {
+                title: "Products!",
+                products,
+                user: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    age: user.age,
+                    email: user.email,
+                    rol: user.rol
+                }
+            })
+        }
+    }
+
     catch (err) {
-        console.log("Error in 'get' products =>" , err)
+        console.log("Error in 'get' products =>", err)
     }
 })
 
 
-
+// PRODUCTO POR ID
 router.get("/:pid", async (req, res) => {
-    try{
+    try {
         const productManager = req.app.get("productManager")
         const idProduct = req.params.pid
         let product = await productManager.getProductById(idProduct)
-    
-        if(!product){
-            res.status(404).json({status: "error", message: `Product with ID: '${idProduct}' was not found.` })
+
+        if (!product) {
+            res.status(404).json({ status: "error", message: `Product with ID: '${idProduct}' was not found.` })
             return
         }
 
@@ -92,54 +113,58 @@ router.get("/:pid", async (req, res) => {
 
 
 
-
+// CREAR PRODUCTO
 router.post("/", async (req, res) => {
-    try{
+    try {
         const productManager = req.app.get("productManager")
-        
-        const {title, description, price, thumbnail, code, stock, status, category} = req.body
-    
-        const newProduct = {title, description, price, thumbnail, code, stock, status, category }
 
-    
+        const { title, description, price, thumbnail, code, stock, status, category } = req.body
+
+        const newProduct = { title, description, price, thumbnail, code, stock, status, category }
+
+
         await productManager.addProduct(newProduct)
-        res.json({status: "success", newProduct: newProduct})
+        res.json({ status: "success", newProduct: newProduct })
     }
-    catch(err) {
+    catch (err) {
         console.log("Error in 'addProduct' => ", err)
     }
 })
 
 
-router.put("/:pid", async (req,res) =>{
-    
-    try{
+// ACTUALIZAR PRODUCTO
+router.put("/:pid", async (req, res) => {
+
+    try {
         const productManager = req.app.get("productManager")
         const idParams = req.params.pid
         const productDataToUpdate = req.body
-    
+
         //console.log(idParams)
         //onsole.log(productDataToUpdate)
-    
+
         await productManager.updateProduct(idParams, productDataToUpdate)
         const productUpdated = await productManager.getProductById(idParams)
 
-        res.send({status: "success", message: "Product updated", productUpdated})
+        res.send({ status: "success", message: "Product updated", productUpdated })
     }
     catch (err) {
-        console.log("Error in 'updateProduct' => ", err )
+        console.log("Error in 'updateProduct' => ", err)
     }
 
 })
-router.delete("/:pid", async (req,res) => {
-    try{
+
+
+// BORRAR PRODUCTO
+router.delete("/:pid", async (req, res) => {
+    try {
         const productManager = req.app.get("productManager")
         const idParams = req.params.pid
         //console.log(idParams)
-    
+
         await productManager.initialize()
         await productManager.deleteById(idParams)
-        res.json({status: "success", message: `Product with ID: '${idParams}' was succesfully removed.`})
+        res.json({ status: "success", message: `Product with ID: '${idParams}' was succesfully removed.` })
     }
     catch (err) {
         console.log("Error in 'deleteById' => ", err)
