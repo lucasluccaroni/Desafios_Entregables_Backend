@@ -2,6 +2,7 @@ const { Router } = require("express")
 const router = Router()
 const User = require("../models/user.model")
 const { userIsAdmin } = require("../middlewares/auth.middleware")
+const { isValidPassword, hashPassword } = require("../utils/hashing")
 
 
 
@@ -20,13 +21,20 @@ router.post("/login", userIsAdmin,  async (req, res) =>{
     }
 
     // 1. Verificar que el usuario exista en la BD - HECHO
-    const user = await User.findOne( { email, password } )
+    const user = await User.findOne( { email } )
 
     if(!user) {
-        return res.status(400).json({error: "User not found"})
+        return res.status(401).json({error: "User not found"})
     }
 
-    //2. Crear una nueva sesion si el usuario existe - HECHO
+
+    //2. Validar password
+    if(!isValidPassword(password, user.password)){
+        return res.status(401).json({error: "Invalid passowrd"})
+        
+    }
+
+    //3. Crear una nueva sesion si el usuario existe - HECHO
     req.session.user = { email, _id: user._id.toString() }
 
     res.redirect("/api/products")
@@ -46,7 +54,7 @@ router.post("/register", async (req, res) => {
             lastName,
             age: +age,
             email,
-            password
+            password: hashPassword(password)
         })
 
         req.session.user = { email, _id: user._id.toString() }
@@ -65,5 +73,27 @@ router.get("/logout", (req, res) =>{
     })
 })
 
+
+// RESET PASSWORD
+router.post("/reset_password" , async (req, res) =>{
+    const { email, password } = req.body
+
+    if( !email || !password ) {
+        return res.status(400).json({error: "Invalid credentials"})
+    }
+
+    // 1. Verificar que el usuario exista en la BD - HECHO
+    const user = await User.findOne( { email })
+
+    if(!user) {
+        return res.status(401).json({error: "User not found"})
+    }
+
+
+    // 2. Actualizar la nueva contraseña
+    await User.updateOne({email}, { $set: { password: hashPassword(password) } })
+
+    res.redirect("/")
+})
 
 module.exports = router

@@ -32,6 +32,14 @@ router.get("/register", userIsNotLoggedIn,  (req, res) => {
     })
 })
 
+// RESET PASSWORD
+router.get("/reset_password", userIsNotLoggedIn,  (req, res) => {
+
+    res.render("reset_password", {
+        title: "Reset Passowrd"
+    })
+})
+
 // PROFILE
 router.get("/profile", userIsLoggedIn, async (req, res) => {
 
