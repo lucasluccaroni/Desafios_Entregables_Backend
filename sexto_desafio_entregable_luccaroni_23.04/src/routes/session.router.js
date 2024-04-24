@@ -10,38 +10,16 @@ const passport = require("passport")
 // LOGIN FORM
 router.post("/login", passport.authenticate("login", {failureRedirect: "/api/sessions/faillogin"}), userIsAdmin,  async (req, res) =>{
 
-
     console.log("Informacion de usuario para login: ", req.body)
 
-
-    // const {email, password} = req.body
-
-
-    // if( !email || !password ) {
-    //     return res.status(400).json({error: "Invalid credentials"})
-    // }
-
-    // // 1. Verificar que el usuario exista en la BD - HECHO
-    // const user = await User.findOne( { email } )
-
-    // if(!user) {
-    //     return res.status(401).json({error: "User not found"})
-    // }
-
-
-    // //2. Validar password
-    // if(!isValidPassword(password, user.password)){
-    //     return res.status(401).json({error: "Invalid passowrd"})
-        
-    // }
-
-    //3. Crear una nueva sesion si el usuario existe - HECHO
+    //Crear una nueva sesion si el usuario existe
     req.session.user = { email: req.user.email, _id: req.user._id }
 
     res.redirect("/api/products")
 })  
 
-// Ruta fail para el passport por si da error
+
+// RUTA FAIL PARA LOGIN
 router.get("/faillogin", (req, res) => {
     res.render("faillogin", {
         title: "Fail login"
@@ -51,35 +29,17 @@ router.get("/faillogin", (req, res) => {
 
 // REGISTER FORM
 router.post("/register", passport.authenticate("register", {failureRedirect: "/api/sessions/failregister"}), async (req, res) => {
+    
     console.log("usuario! ", req.user)
 
-    // console.log("Info del nuevo usuario", req.body)
-    // //To Do: Crear nuevo usuario insertandolo en la collection de users y logueandolo en la pagina - HECHO
-    // try{
-    //     const { firstName, lastName, age, email, password } = req.body
-
-    //     const user = await User.create( {
-    //         firstName,
-    //         lastName,
-    //         age: +age,
-    //         email,
-    //         password: hashPassword(password)
-    //     })
-
-    //     req.session.user = { email, _id: user._id.toString() }
-        res.redirect("/")
-
-    // }
-    // catch(err) {
-    //     return res.status(500).json({error: err})
-    // }
+    res.redirect("/")
 })
 
-// Ruta fail para el passport por si da error
+
+// RUTA FAIL PARA REGISTER
 router.get("/failregister", (req, res) => {
     res.send("Error registering user!")
 })
-
 
 
 // LOGOUT
@@ -111,5 +71,6 @@ router.post("/reset_password" , async (req, res) =>{
 
     res.redirect("/")
 })
+
 
 module.exports = router
