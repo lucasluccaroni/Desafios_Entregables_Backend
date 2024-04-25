@@ -7,6 +7,15 @@ const passport = require("passport")
 
 
 
+
+
+router.get("/github", passport.authenticate("github", { scope: ["user: email"]}), async (req, res) => {})
+
+router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/api/sessions/fallogin"}), async (req, res) => {
+    req.session.user = { /* email: req.user.email, */ _id: req.user._id }
+    res.redirect("/profile")
+})
+
 // LOGIN FORM
 router.post("/login", passport.authenticate("login", {failureRedirect: "/api/sessions/faillogin"}), userIsAdmin,  async (req, res) =>{
 
@@ -17,7 +26,6 @@ router.post("/login", passport.authenticate("login", {failureRedirect: "/api/ses
 
     res.redirect("/api/products")
 })  
-
 
 // RUTA FAIL PARA LOGIN
 router.get("/faillogin", (req, res) => {

@@ -3,7 +3,8 @@ const expressHandlebars = require("express-handlebars")
 const mongoose = require("mongoose")
 const passport = require("passport")
 
-const initializeStrategy = require("./config/passport.config")
+const initializeStrategyGitHub = require("./config/passport-github.config")
+const initializeStrategyLocal = require("./config/passport-local.config")
 const { dbName, mongoUrl } = require("./dbConfig")
 const sessionMiddleware = require("./session/mongoStorage")
 
@@ -14,7 +15,10 @@ const CartManager = require("./dao/dbManagers/cartManager")
 
 app.use(sessionMiddleware)
 
-initializeStrategy()
+
+// Las dos estrategias de passport funcionan en simultaneo
+initializeStrategyLocal()
+initializeStrategyGitHub()
 app.use(passport.initialize())
 app.use(passport.session())
 
