@@ -24,7 +24,7 @@ class CartsDAO {
     async getCartById(id) {
         try {
             const cart = await CartModel.findOne(id)
-            return cart?.toObject ?? false
+            return cart ?? false
         }
         catch (err) {
             console.log("Error en CartsDAO - getCartById => ", err)
@@ -43,17 +43,31 @@ class CartsDAO {
         }
     }
 
-    async addProductToExistingCart(cid, product) {
+    async addProductToExistingCart(cid, pid, quantity) {
         try {
-            const { pid, quantity } = product
 
             const cart = await CartModel.findOne({ _id: cid })
             console.log("CARRITO ENCONTRADO => ", cart)
 
-            const productToAdd = ProductModel.findOne({ _id: pid })
+            const productToAdd = await ProductModel.findById(pid)
             console.log("PRODUCTO ENCONTRADO => ", productToAdd)
 
-            //TODO: Actualizar +1 el producto si ya existe en el carrito, sino agregarlo.
+
+            //Verificacion si el producto ya esta en el carrito
+            let found = cart.products.find(productToAdd => {
+                return (productToAdd._id.toString() === pid)
+            })
+            console.log(found)
+            
+
+            // Si no esta, lo agrego
+            if(!found){
+                const cartUpdate = await CartModel.updateOne({_id: cid}, { $push: { products: { _id: pid, quantity }}})
+                return cartUpdate
+            }
+            
+            //TODO: Agregar el producto si no existe en el carrito: -- HECHO
+            //TODO: Actualizar +1 el producto si ya existe en el carrito
         }
         catch (err) {
             console.log("Error en CartsDAO - addProductToExistingCart => ", err)
@@ -102,7 +116,8 @@ class CartsDAO {
             const cart = await CartModel.findOne({ _id: cid })
             console.log("CARRITO ENCONTRADO => ", cart)
 
-            const product = await ProductModel.findOne({ _id: pid })
+            const product = await ProductModel.findById(pid)
+            product.toObject()
             console.log("PRODUCTO ENCONTRADO => ", product)
 
             //TODO: Implementar funcion de eliminacion.
@@ -127,3 +142,6 @@ class CartsDAO {
         }
     }
 }
+
+module.exports = { CartsDAO }
+

@@ -1,12 +1,11 @@
 const { Products } = require("../dao")
 const productsDAO = new Products()
 
-//TODO: PONER LOS RENDERS DE PRODUCTS ACA PARA PARA QUE SEAN LLAMADOS POR ROUTES
-
 module.exports = {
 
-    getProducts: async (req, res) => {
+    getProducts: async (_, res) => {
         
+        // res.send({status: "success", payload: "getProducts"})
         const result = await productsDAO.getProducts()
         if (!result) {
             return res.sendError({ message: "Something went wrong!" })

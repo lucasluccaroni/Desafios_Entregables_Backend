@@ -23,6 +23,10 @@ const schema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    stock: {
+        type: Number,
+        required: true
+    },
     status: {
         type: Boolean,
         required: true,
