@@ -1,0 +1,12 @@
+npm install mongodb
+
+mongodb+srv://lucasluccaroni:<password>@coderhousebackend.jc3sija.mongodb.net/?retryWrites=true&w=majority&appName=CoderhouseBackend
+!!! Replace <password> with the password for the lucasluccaroni user. Ensure any option params are !!!
+
+
+mongodb+srv://lucasluccaroni:lucasluccaroni@coderhousebackend.jc3sija.mongodb.net/?retryWrites=true&w=majority&appName=CoderhouseBackend
+
+
+username: lucasluccaroni 
+user: lucasluccaroni@admin
+password: Colondesantafe22.
