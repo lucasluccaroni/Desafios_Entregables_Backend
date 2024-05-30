@@ -5,7 +5,7 @@ const productsDAO = new Products()
 
 module.exports = {
 
-    getProducts: async (req, res) => {
+    getProducts: async (_, res) => {
         
         const result = await productsDAO.getProducts()
         if (!result) {

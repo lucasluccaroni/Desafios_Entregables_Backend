@@ -9,10 +9,9 @@ module.exports = () => {
     router.get("/:cid", cartsController.getCartById)
     router.post("/", cartsController.createCart)
     router.post("/:cid/product/:pid", cartsController.addProductToExistingCart)
-    router.put("/:cid/carts/:pid", cartsController.updateProductFromExistingCart)
-    router.put("/:cid", cartsController.updateArrayInCart)
+    router.put("/:cid/products/:pid", cartsController.updateProductFromExistingCart)
     router.delete("/:cid/product/:pid", cartsController.deleteProductFromExistingCart)
     router.delete("/:cid", cartsController.clearCart)
-
+    router.delete("/delete/:cid", cartsController.deleteCart)
     return router
 }

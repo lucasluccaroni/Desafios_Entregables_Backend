@@ -4,7 +4,6 @@ const cartsDAO = new Carts()
 module.exports = {
 
     getCarts: async (_, res) => {
-        // res.send({status: "success", payload: "getCarts"})
         const result = await cartsDAO.getCarts()
         if (!result) {
             return res.sendError({ message: "Something went wrong!" })
@@ -53,18 +52,52 @@ module.exports = {
     },
 
     updateProductFromExistingCart: async (req, res) => {
-        res.send({status: "success", payload: "updateProductFromExistingCart"})
-    },
+        const cartId = req.params.cid
+        const productId = req.params.pid
+        const {quantity} = req.body
 
-    updateArrayInCart: async (req, res) => {
-        res.send({status: "success", payload: "updateArrayInCart"})
+        console.log("PRODUCT QUANTITY => ", quantity )
+
+        const result = await cartsDAO.updateProductFromExistingCart(cartId, productId, quantity)
+        if (!result) {
+            return res.sendError({ message: "Something went wrong!" })
+        }
+
+        res.sendSuccess(result)
+
     },
 
     deleteProductFromExistingCart: async (req, res) => {
-        res.send({status: "success", payload: "deleteProductFromExistingCart"})
+        const cartId = req.params.cid
+        const productId = req.params.pid
+
+        const result = await cartsDAO.deleteProductFromExistingCart(cartId, productId)
+        if (!result) {
+            return res.sendError({ message: "Something went wrong!" })
+        }
+
+        res.sendSuccess(result)
     },
 
     clearCart: async (req, res) => {
-        res.send({status: "success", payload: "clearCart"})
+        const cartId = req.params.cid
+
+        const result = await cartsDAO.clearCart(cartId)
+        if(!result) {
+            return res.sendError("Something went wrong!")
+        }
+
+        res.sendSuccess(result)
+    },
+
+    deleteCart: async (req, res) => {
+        const cartId = req.params.cid
+
+        const result = await cartsDAO.deleteCart(cartId)
+        if(!result) {
+            return res.sendError("Something went wrong!")
+        }
+
+        res.sendSuccess(result)
     }
 }

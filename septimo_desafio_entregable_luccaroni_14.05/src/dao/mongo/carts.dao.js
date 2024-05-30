@@ -53,21 +53,35 @@ class CartsDAO {
             console.log("PRODUCTO ENCONTRADO => ", productToAdd)
 
 
-            //Verificacion si el producto ya esta en el carrito
+            // Verificacion si el producto ya esta en el carrito
             let found = cart.products.find(productToAdd => {
                 return (productToAdd._id.toString() === pid)
             })
             console.log(found)
-            
+
 
             // Si no esta, lo agrego
-            if(!found){
-                const cartUpdate = await CartModel.updateOne({_id: cid}, { $push: { products: { _id: pid, quantity }}})
+            if (!found) {
+                const cartUpdate = await CartModel.updateOne({ _id: cid }, { $push: { products: { _id: pid, quantity } } })
                 return cartUpdate
+
+                // Si ya esta en el carrito, actualizo la cantidad.
+            } else if (found) {
+                console.log("FOUND ENCONTRADO => ", found)
+                quantity += found.quantity
+
+                try {
+                    const cartUpdate = await CartModel.updateOne({ _id: cid, "products._id": pid }, { $set: { "products.$.quantity": quantity } })
+
+                    console.log(`CART ACTUALIZADO: ${await CartModel.findOne({ _id: cid })}`);
+                    return cartUpdate
+
+                }
+                catch (err) {
+                    console.log("Error en CartsDAO - addProductToExistingCart => ", err)
+                    return null
+                }
             }
-            
-            //TODO: Agregar el producto si no existe en el carrito: -- HECHO
-            //TODO: Actualizar +1 el producto si ya existe en el carrito
         }
         catch (err) {
             console.log("Error en CartsDAO - addProductToExistingCart => ", err)
@@ -75,18 +89,30 @@ class CartsDAO {
         }
     }
 
-    async updateProductFromExistingCart(cid, product) {
+    async updateProductFromExistingCart(cid, pid, quantity) {
         try {
-            const { pid, quantity } = product
-            console.log(`PRODUCT ID = ${pid} /// CANTIDAD = ${quantity}`)
-
             const cart = await CartModel.findOne({ _id: cid })
             console.log("CARRITO ENCONTRADO => ", cart)
 
-            const productToUpdate = ProductModel.findOne({ _id: pid })
-            console.log("PRODUCTO ENCONTRADO => ", productToUpdate)
+            const productToAdd = await ProductModel.findById(pid)
+            console.log("PRODUCTO ENCONTRADO => ", productToAdd)
 
-            //TODO: Implementar funcion de actualizacion.
+            // Verificacion si el producto ya esta en el carrito
+            let found = cart.products.find(productToAdd => {
+                return (productToAdd._id.toString() === pid)
+            })
+            console.log(found)
+
+            // Si está, actualizo la cantidad.
+            if (found) {
+                console.log("FOUND ENCONTRADO => ", found)
+                found.quantity = quantity
+
+                const cartUpdate = await CartModel.updateOne({ _id: cid, "products._id": pid }, { $set: { "products.$.quantity": quantity } })
+
+                console.log(`CART ACTUALIZADO: ${await CartModel.findOne({ _id: cid })}`);
+                return cartUpdate
+            }
         }
         catch (err) {
             console.log("Error en CartsDAO - updateProductFromExistingCart => ", err)
@@ -95,32 +121,20 @@ class CartsDAO {
         }
     }
 
-    async updateArrayInCart(cid, products) {
-        try {
-            const cart = await CartModel.findOne({ _id: cid })
-            console.log("CARRITO ENCONTRADO => ", cart)
-
-            console.log("PRODUCTOS: => ", products)
-
-            //TODO: Implementar funcion de actualizacion.
-
-        }
-        catch (err) {
-            console.log("Error en CartsDAO - updateArrayInCart => ", err)
-            return null
-        }
-    }
-
     async deleteProductFromExistingCart(cid, pid) {
         try {
             const cart = await CartModel.findOne({ _id: cid })
             console.log("CARRITO ENCONTRADO => ", cart)
+            if (!cart) throw new Error('cart not found');
 
-            const product = await ProductModel.findById(pid)
+            const product = await ProductModel.findOne({ _id: pid })
             product.toObject()
             console.log("PRODUCTO ENCONTRADO => ", product)
+            if (!product) throw new Error('product not found');
 
-            //TODO: Implementar funcion de eliminacion.
+
+            const cartUpdate = await CartModel.updateOne({ _id: cid }, { $pull: { products: { _id: pid } } })
+            return cartUpdate
 
         }
         catch (err) {
@@ -131,13 +145,33 @@ class CartsDAO {
 
     async clearCart(cid) {
         try {
-            const cart = await CartModel.findOne({ _id: cid })
-            console.log("CARRITO ENCONTRADO => ", cart)
+            const cart = await CartModel.findOne({ _id: cid });
+            if (!cart) throw new Error('cart not found');
 
-            //TODO: Implementar funcion de limpieza
+            const cartUpdate = await CartModel.updateOne({ _id: cid }, {
+                $set: { products: [] }
+            })
+
+            console.log(`Carrito actualizado: ${cartUpdate}`);
+            return cartUpdate;
         }
-        catch(err) {
+        catch (err) {
             console.log("Error en CartsDAO - clearCart => ", err)
+            return null
+        }
+    }
+
+    async deleteCart(cid) {
+        try {
+            const cartDelete = await CartModel.deleteOne({ _id: cid });
+            if (cartDelete.deletedCount == 0) {
+                throw new Error('cart not found');
+            }
+            // console.log(`Carrito eliminado: ${cartDelete}`);
+            return cartDelete;
+        }
+        catch (err) {
+            console.log("Error en CartsDAO - deleteCart => ", err)
             return null
         }
     }
