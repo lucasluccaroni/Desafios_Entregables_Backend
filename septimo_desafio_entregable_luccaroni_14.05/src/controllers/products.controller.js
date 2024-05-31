@@ -1,69 +1,76 @@
-const { Products } = require("../dao")
-const productsDAO = new Products()
-
 //TODO: PONER LOS RENDERS DE PRODUCTS ACA PARA PARA QUE SEAN LLAMADOS POR ROUTES
 
-module.exports = {
+class ProductsController {
+    constructor(service) {
+        this.service = service
+    }
 
-    getProducts: async (_, res) => {
-        
-        const result = await productsDAO.getProducts()
-        if (!result) {
-            return res.sendError({ message: "Something went wrong!" })
+    async getProducts(_, res) {
+        try {
+            const result = await this.service.getProducts()
+            res.sendSuccess(result)
+        }
+        catch (err) {
+            res.sendError(err.message)
         }
 
-        res.sendSuccess(result)
-    },
+    }
 
-    getProductById: async (req, res) => {
-        // res.send({status: "success", payload: "getProductsById"})
-        const id = req.params.pid
+    async getProductById(req, res) {
+        try {
+            const id = req.params.pid
+            const product = await this.service.getProductById(id)
 
-        const product = await productsDAO.getProductById(id)
-        if (!product) {
-            return product === false
-                ? res.sendError({message: "Not Found"}, 404)
-                : res.sendError({message: "Something went wrong!"})
+            res.sendSuccess(product)
         }
-
-        res.sendSuccess(product)
-    },
-
-    addProduct: async (req, res) => {
-        // res.send({status: "success", payload: "addProduct"})
-        const productData = req.body
-
-        const newProduct = await productsDAO.addProduct(productData)
-        if (!newProduct) {
-            return res.sendError({ message: "Something went wrong!" })
+        catch (err) {
+            console.log("CATCH EN CONTROLLER - getProductById => ", err)
+            res.sendError(err.message)
         }
+    }
 
-        res.sendSuccess(newProduct)
-    },
+    async addProduct(req, res) {
+        try {
+            const productData = req.body
 
-    updateProduct: async (req, res) => {
-        // res.send({status: "success", payload: "updateProduct"})
-        const id = req.params.pid
-        const productData = req.body
+            const newProduct = await this.service.addProduct(productData)
+            console.log("NEW PRODUCT CONTROLLER => ", newProduct)
 
-        const updatedProduct = await productsDAO.updateProduct(id, productData)
-        if (!updatedProduct) {
-            return res.sendError({ message: "Something went wrong!" })
+            res.sendSuccess(newProduct)
         }
-
-        res.sendSuccess(updatedProduct)
-    },
-
-    deleteProduct: async (req, res) => {
-        // res.send({status: "success", payload: "deleteProduct"})
-
-        const id = req.params.pid
-
-        const deletedProduct = await productsDAO.deleteProduct(id)
-        if (!deletedProduct) {
-            return res.sendError({ message: "Something went wrong!" })
+        catch (err) {
+            console.log("CATCH EN CONTROLLER - addProduct => ", err)
+            res.sendError(err.message)
         }
+    }
 
-        res.sendSuccess(deletedProduct)
+    async updateProduct(req, res) {
+        try {
+            const id = req.params.pid
+            const productData = req.body
+
+            const updatedProduct = await this.service.updateProduct(id, productData)
+
+            res.sendSuccess("Product updated succesfully")
+        }
+        catch (err) {
+            console.log("CATCH EN CONTROLLER - updateProduct => ", err)
+            res.sendError(err.message)
+        }
+    }
+
+    async deleteProduct(req, res) {
+        try {
+            const id = req.params.pid
+            const deletedProduct = await this.service.deleteProduct(id)
+
+            res.sendSuccess(`Product succesfully deleted`)
+        }
+        catch (err) {
+            console.log("CATCH EN CONTROLLER - deleteProduct => ", err)
+            res.sendError(err.message)
+        }
     }
 }
+
+module.exports = { ProductsController }

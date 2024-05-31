@@ -1,68 +1,85 @@
-const { Products } = require("../dao")
-const productsDAO = new Products()
+// Service - Repository
 
-module.exports = {
+class ProductsService {
+    constructor(dao) {
+        this.dao = dao
+    }
 
-    getProducts: async (_, res) => {
-        
-        // res.send({status: "success", payload: "getProducts"})
-        const result = await productsDAO.getProducts()
-        if (!result) {
-            return res.sendError({ message: "Something went wrong!" })
+    async getProducts() {
+
+        const products = await this.dao.getProducts()
+        if (!products) {
+            throw new Error("Someting went wrong!")
         }
 
-        res.sendSuccess(result)
-    },
+        return products
+    }
 
-    getProductById: async (req, res) => {
-        // res.send({status: "success", payload: "getProductsById"})
-        const id = req.params.pid
+    async getProductById(id) {
 
-        const product = await productsDAO.getProductById(id)
-        if (!product) {
-            return product === false
-                ? res.sendError({message: "Not Found"}, 404)
-                : res.sendError({message: "Something went wrong!"})
+        const product = await this.dao.getProductById(id)
+        console.log("RESPUESTA PRODUCT DAO => ", product)
+        if (product === false) {
+            throw new Error("Not found!")
+
+        } else if (product === null) {
+            throw new Error("Invalid caracters")
         }
 
-        res.sendSuccess(product)
-    },
+        return product
+    }
 
-    addProduct: async (req, res) => {
-        // res.send({status: "success", payload: "addProduct"})
-        const productData = req.body
+    async addProduct(productData) {
 
-        const newProduct = await productsDAO.addProduct(productData)
-        if (!newProduct) {
-            return res.sendError({ message: "Something went wrong!" })
+        const { title, description, code, price, status, stock, category, thumbnail } = productData
+        if (!title || !code || price < 0 || stock < 0 || !category || !description) {
+            throw new Error("Invalid parameters")
         }
 
-        res.sendSuccess(newProduct)
-    },
+        return await this.dao.addProduct(productData)
+    }
 
-    updateProduct: async (req, res) => {
-        // res.send({status: "success", payload: "updateProduct"})
-        const id = req.params.pid
-        const productData = req.body
+    async updateProduct(id, productData) {
 
-        const updatedProduct = await productsDAO.updateProduct(id, productData)
+        // Verificacion de que propiedades se quieren actualizar, y que estas sean parte de las propiedades del Product.Model
+        let dataKeys = Object.keys(productData)
+        // console.log("DATAKEYS =>", dataKeys)
+
+        if (!dataKeys.includes("title") && !dataKeys.includes("description") && !dataKeys.includes("price") && !dataKeys.includes("stock") && !dataKeys.includes("status")) {
+            throw new Error("Invalid property")
+        }
+
+        const productToUpdate = await this.dao.getProductById(id)
+        console.log("PRODUCT FOUND SERVICE", productToUpdate)
+
+
+        if (!productToUpdate) {
+            throw new Error("Product not found!")
+        }
+
+        const updatedProduct = await this.dao.updateProduct(id, productData)
         if (!updatedProduct) {
-            return res.sendError({ message: "Something went wrong!" })
+            throw new Error("Error updating product!")
         }
 
-        res.sendSuccess(updatedProduct)
-    },
+        return updatedProduct
+    }
 
-    deleteProduct: async (req, res) => {
-        // res.send({status: "success", payload: "deleteProduct"})
+    async deleteProduct(id) {
 
-        const id = req.params.pid
+        const deletedProduct = await this.dao.deleteProduct(id)
 
-        const deletedProduct = await productsDAO.deleteProduct(id)
         if (!deletedProduct) {
-            return res.sendError({ message: "Something went wrong!" })
+            throw new Error("Something went wrong!")
+
+        } else if (deletedProduct.deletedCount == 0) {
+            console.log("DELETED PRODUCT SERVICE", deletedProduct.deletedCount)
+            throw new Error("Product not found!")
         }
 
-        res.sendSuccess(deletedProduct)
+        console.log("DELETED PRODUCT SERVICE", deletedProduct.deletedCount)
+        return (deletedProduct)
     }
 }
+
+module.exports = { ProductsService }
