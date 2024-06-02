@@ -29,12 +29,13 @@ module.exports = () => {
         controller.addProductToExistingCart(req, res)
     })
     
-    // router.put("/:cid/products/:pid", cartsController.updateProductFromExistingCart)
     router.put("/:cid/products/:pid", (req, res) => {
         controller.updateProductFromExistingCart(req, res)
     })
 
-    // router.delete("/:cid/product/:pid", cartsController.deleteProductFromExistingCart)
+    router.delete("/:cid/product/:pid", (req, res) => {
+        controller.deleteProductFromExistingCart(req, res)
+    })
 
     router.delete("/:cid", (req, res) => {
         controller.clearCart(req, res)
@@ -43,5 +44,6 @@ module.exports = () => {
     router.delete("/delete/:cid", (req, res) => {
         controller.deleteCart(req, res)
     })
+    
     return router
 }

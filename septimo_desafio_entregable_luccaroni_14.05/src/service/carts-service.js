@@ -3,9 +3,11 @@ const ProductModel = require("../dao/models/product.model")
 const CartModel = require("../dao/models/cart.model")
 
 const { ProductsDAO } = require("../dao/mongo/products.dao")
-const { ProductsService} = require("./products-service")
+const { ProductsService } = require("./products-service")
 const productsDAO = new ProductsDAO()
 const productsService = new ProductsService(productsDAO)
+
+const { CartsDTO } = require("../dao/dtos/carts.dto")
 
 class CartsService {
     constructor(dao) {
@@ -17,6 +19,15 @@ class CartsService {
         if (!carts) {
             throw new Error("Someting went wrong!")
         }
+
+        // // Transformacion de carts usando DTO
+        // const cartsTransformed = carts.map(c => {
+        //     const dto = new CartsDTO(c)
+        //     const transformation = dto.trasnform()
+        //     return transformation
+        // })
+
+        // return cartsTransformed
         return carts
     }
 
@@ -25,7 +36,7 @@ class CartsService {
         console.log("RESPUESTA getCartById DAO => ", cart)
 
         if (cart === false) {
-            throw new Error("Not found!")
+            throw new Error("Cart not found!")
 
         } else if (cart === null) {
             throw new Error("Invalid caracters")
@@ -41,6 +52,11 @@ class CartsService {
             throw new Error("Someting went wrong!")
         }
 
+        // // Transformacion de cart usando DTO
+        // const dto = new CartsDTO(result)
+        // const cartTransformed = dto.trasnform()
+
+        // return cartTransformed
         return result
     }
 
@@ -70,6 +86,12 @@ class CartsService {
 
             // Si no existe, lo agrego al carrito
             if (!found) {
+
+                // Verifico la cantidad actual, la que se quiere ingresar y el stock disponible
+                if (quantity < 0 || quantity > productToAdd.stock) {
+                throw new Error("Wrong quantity")
+                }
+
                 productExistInCart = false
                 const cartUpdate = this.dao.addProductToExistingCart(productExistInCart, cartId, productId, quantity)
                 return cartUpdate
@@ -77,6 +99,11 @@ class CartsService {
                 // Si existe, sumo la cantidad ingresada + la que que tenia y actualizo el producto    
             } else if (found) {
                 console.log("FOUND ENCONTRADO => ", found)
+
+                // Verifico la cantidad actual, la que se quiere actualizar y el stock disponible
+                if (found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock) {
+                throw new Error("Wrong quantity")
+                }
 
                 quantity += found.quantity
                 productExistInCart = true
@@ -108,16 +135,40 @@ class CartsService {
         if (found) {
 
             // Verifico la cantidad actual, la que se quiere actualizar y el stock disponible
-            if(found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock){
-                throw new Error ("Wrong quantity")
+            if (found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock) {
+                throw new Error("Wrong quantity")
             }
 
             found.quantity = quantity
-            
+
             const cartUpdate = await this.dao.updateProductFromExistingCart(cartId, productId, quantity)
             return cartUpdate
-        
-        // Si no está, arrojo un error
+
+            // Si no está, arrojo un error
+        } else if (!found) {
+            throw new Error("Product is not in cart!")
+        }
+    }
+
+    async deleteProductFromExistingCart(cartId, productId) {
+
+        // Busco el carrito
+        const cart = await this.getCartById(cartId)
+
+        // Busco el producto
+        const productToDelete = await productsService.getProductById(productId)
+
+        // Verificacion si el producto ya esta en el carrito
+        let found = cart.products.find(productToDelete => {
+            return (productToDelete._id.toString() === productId)
+        })
+
+        // Si esta, actualizo el carrito quitando ese producto
+        if (found) { 
+            const deleteProduct = await this.dao.deleteProductFromExistingCart(cartId, productToDelete.id)
+            return deleteProduct
+
+        // Si no esta, arrojo un error
         } else if (!found) {
             throw new Error("Product is not in cart!")
         }

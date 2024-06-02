@@ -84,19 +84,18 @@ class CartsDAO {
         }
     }
 
-    async deleteProductFromExistingCart(cid, pid) {
+    async deleteProductFromExistingCart(cartId, productId) {
         try {
-            const cart = await CartModel.findOne({ _id: cid })
-            console.log("CARRITO ENCONTRADO => ", cart)
-            if (!cart) throw new Error('cart not found');
+            // const cart = await CartModel.findOne({ _id: cartId })
+            // console.log("CARRITO ENCONTRADO => ", cart)
+            // if (!cart) throw new Error('cart not found');
 
-            const product = await ProductModel.findOne({ _id: pid })
-            product.toObject()
-            console.log("PRODUCTO ENCONTRADO => ", product)
-            if (!product) throw new Error('product not found');
+            // const product = await ProductModel.findOne({ _id: productId })
+            // product.toObject()
+            // console.log("PRODUCTO ENCONTRADO => ", product)
+            // if (!product) throw new Error('product not found');
 
-
-            const cartUpdate = await CartModel.updateOne({ _id: cid }, { $pull: { products: { _id: pid } } })
+            const cartUpdate = await CartModel.updateOne({ _id: cartId }, { $pull: { products: { _id: productId } } })
             return cartUpdate
 
         }

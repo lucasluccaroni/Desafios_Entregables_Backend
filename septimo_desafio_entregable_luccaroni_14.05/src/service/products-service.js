@@ -1,4 +1,6 @@
 // Service - Repository
+const {ProductsDTO} = require("../dao/dtos/products.dto")
+
 
 class ProductsService {
     constructor(dao) {
@@ -12,7 +14,15 @@ class ProductsService {
             throw new Error("Someting went wrong!")
         }
 
-        return products
+        // Transformacion de productos usando DTO
+        const productsTransformed = products.map(p => {
+            const dto = new ProductsDTO(p)
+            const transformation = dto.transform()
+            return transformation
+        })
+        //console.log("PRODUCTS DTO",productsTransformed)
+
+        return productsTransformed
     }
 
     async getProductById(id) {
@@ -20,13 +30,17 @@ class ProductsService {
         const product = await this.dao.getProductById(id)
         console.log("RESPUESTA PRODUCT DAO => ", product)
         if (product === false) {
-            throw new Error("Not found!")
+            throw new Error("Product not found!")
 
         } else if (product === null) {
             throw new Error("Invalid caracters")
         }
 
-        return product
+        // Transformacion de producto usando DTO
+        const dto = new ProductsDTO(product)
+        const productTransformed = dto.transform()
+        //console.log(productTransformed)
+        return productTransformed
     }
 
     async addProduct(productData) {

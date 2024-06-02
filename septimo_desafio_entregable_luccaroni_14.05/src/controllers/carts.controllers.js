@@ -1,3 +1,5 @@
+const { CartsDTO } = require("../dao/dtos/carts.dto")
+
 
 class CartsController {
     constructor(service) {
@@ -7,7 +9,16 @@ class CartsController {
     async getCarts(_, res) {
         try {
             const result = await this.service.getCarts()
-            res.sendSuccess(result)
+
+
+            // Transformacion de carts usando DTO
+            const cartsTransformed = result.map(c => {
+                const dto = new CartsDTO(c)
+                const transformation = dto.trasnformOneCart()
+                return transformation
+            })
+
+            res.sendSuccess(cartsTransformed)
         }
         catch (err) {
             res.sendError(err.message)
@@ -18,7 +29,12 @@ class CartsController {
         try {
             const id = req.params.cid
             const cart = await this.service.getCartById(id)
-            res.sendSuccess(cart)
+
+            // Transformacion de cart usando DTO
+            const dto = new CartsDTO(cart)
+            const cartTransformed = dto.trasnformOneCart()
+
+            res.sendSuccess(cartTransformed)
         }
         catch (err) {
             res.sendError(err.message)
@@ -28,7 +44,13 @@ class CartsController {
     async createCart(_, res) {
         try {
             const newCart = await this.service.createCart()
-            res.sendSuccess(newCart)
+
+            // Transformacion de cart usando DTO
+            const dto = new CartsDTO(newCart)
+            const cartTransformed = dto.trasnformOneCart()
+
+
+            res.sendSuccess(cartTransformed)
         }
         catch (err) {
             res.sendError(err.message)
@@ -36,11 +58,11 @@ class CartsController {
     }
 
     async addProductToExistingCart(req, res) {
-        try{
+        try {
             const cartId = req.params.cid
             const productId = req.params.pid
             const { quantity } = req.body
-    
+
             console.log("PRODUCT QUANTITY CART CONTROLLER => ", quantity)
             console.log("CART ID CONTROLLER => ", cartId)
             console.log("PRODUCT ID CONTROLLER => ", productId)
@@ -49,23 +71,23 @@ class CartsController {
 
             res.sendSuccess(result)
         }
-        catch(err) {
+        catch (err) {
             res.sendError(err.message)
         }
     }
 
     async updateProductFromExistingCart(req, res) {
-        try{
+        try {
             const cartId = req.params.cid
             const productId = req.params.pid
             const { quantity } = req.body
             console.log("PRODUCT QUANTITY CONTROLLER => ", quantity)
-    
+
             const result = await this.service.updateProductFromExistingCart(cartId, productId, quantity)
-            
+
             res.sendSuccess(result)
         }
-        catch(err){
+        catch (err) {
             console.log(err)
             res.sendError(err.message)
         }
@@ -73,26 +95,29 @@ class CartsController {
     }
 
     async deleteProductFromExistingCart(req, res) {
-        const cartId = req.params.cid
-        const productId = req.params.pid
+        try {
+            const cartId = req.params.cid
+            const productId = req.params.pid
 
-        const result = await cartsDAO.deleteProductFromExistingCart(cartId, productId)
-        if (!result) {
-            return res.sendError({ message: "Something went wrong!" })
+            const result = await this.service.deleteProductFromExistingCart(cartId, productId)
+
+            res.sendSuccess(result)
         }
-
-        res.sendSuccess(result)
+        catch (err) {
+            console.log(err)
+            res.sendError(err.message)
+        }
     }
 
     async clearCart(req, res) {
-        try{
+        try {
             const cartId = req.params.cid
             console.log("CARTID CONTROLLER => ", cartId)
             const result = await this.service.clearCart(cartId)
             console.log("REULT CONTROLLER => ", result)
             res.sendSuccess(result)
         }
-        catch(err) {
+        catch (err) {
             console.log(err)
             res.sendError(err.message)
         }

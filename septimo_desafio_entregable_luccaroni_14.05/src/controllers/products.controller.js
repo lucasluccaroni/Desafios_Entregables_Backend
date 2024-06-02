@@ -11,7 +11,9 @@ class ProductsController {
             res.sendSuccess(result)
         }
         catch (err) {
+            console.log(err)
             res.sendError(err.message)
+
         }
 
     }
