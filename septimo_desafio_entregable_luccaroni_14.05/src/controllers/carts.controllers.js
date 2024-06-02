@@ -1,73 +1,78 @@
-const { Carts } = require("../dao")
-const cartsDAO = new Carts()
 
-module.exports = {
+class CartsController {
+    constructor(service) {
+        this.service = service
+    }
 
-    getCarts: async (_, res) => {
-        const result = await cartsDAO.getCarts()
-        if (!result) {
-            return res.sendError({ message: "Something went wrong!" })
+    async getCarts(_, res) {
+        try {
+            const result = await this.service.getCarts()
+            res.sendSuccess(result)
+        }
+        catch (err) {
+            res.sendError(err.message)
+        }
+    }
+
+    async getCartById(req, res) {
+        try {
+            const id = req.params.cid
+            const cart = await this.service.getCartById(id)
+            res.sendSuccess(cart)
+        }
+        catch (err) {
+            res.sendError(err.message)
+        }
+    }
+
+    async createCart(_, res) {
+        try {
+            const newCart = await this.service.createCart()
+            res.sendSuccess(newCart)
+        }
+        catch (err) {
+            res.sendError(err.message)
+        }
+    }
+
+    async addProductToExistingCart(req, res) {
+        try{
+            const cartId = req.params.cid
+            const productId = req.params.pid
+            const { quantity } = req.body
+    
+            console.log("PRODUCT QUANTITY CART CONTROLLER => ", quantity)
+            console.log("CART ID CONTROLLER => ", cartId)
+            console.log("PRODUCT ID CONTROLLER => ", productId)
+
+            const result = await this.service.addProductToExistingCart(cartId, productId, quantity)
+
+            res.sendSuccess(result)
+        }
+        catch(err) {
+            res.sendError(err.message)
+        }
+    }
+
+    async updateProductFromExistingCart(req, res) {
+        try{
+            const cartId = req.params.cid
+            const productId = req.params.pid
+            const { quantity } = req.body
+            console.log("PRODUCT QUANTITY CONTROLLER => ", quantity)
+    
+            const result = await this.service.updateProductFromExistingCart(cartId, productId, quantity)
+            
+            res.sendSuccess(result)
+        }
+        catch(err){
+            console.log(err)
+            res.sendError(err.message)
         }
 
-        res.sendSuccess(result)
-    },
+    }
 
-    getCartById: async (req, res) => {
-        const id = req.params.pid
-
-        const cart = await cartsDAO.getCartById(id)
-        if (!cart) {
-            return cart === false
-                ? res.sendError({message: "Not Found"}, 404)
-                : res.sendError({message: "Something went wrong!"})
-        }
-
-        res.sendSuccess(cart)
-    },
-
-    createCart: async (_, res) => {
-        // res.send({status: "success", payload: "createCart"})
-        const newCart = await cartsDAO.createCart()
-        if (!newCart) {
-            return res.sendError({ message: "Something went wrong!" })
-        }
-
-        res.sendSuccess(newCart)
-    },
-
-    addProductToExistingCart: async (req, res) => {
-        const cartId = req.params.cid
-        const productId = req.params.pid
-        const {quantity} = req.body
-
-        console.log("PRODUCT QUANTITY => ", quantity )
-
-        const result = await cartsDAO.addProductToExistingCart(cartId, productId, quantity)
-        if (!result) {
-            return res.sendError({ message: "Something went wrong!" })
-        }
-
-        res.sendSuccess(result)
-        
-    },
-
-    updateProductFromExistingCart: async (req, res) => {
-        const cartId = req.params.cid
-        const productId = req.params.pid
-        const {quantity} = req.body
-
-        console.log("PRODUCT QUANTITY => ", quantity )
-
-        const result = await cartsDAO.updateProductFromExistingCart(cartId, productId, quantity)
-        if (!result) {
-            return res.sendError({ message: "Something went wrong!" })
-        }
-
-        res.sendSuccess(result)
-
-    },
-
-    deleteProductFromExistingCart: async (req, res) => {
+    async deleteProductFromExistingCart(req, res) {
         const cartId = req.params.cid
         const productId = req.params.pid
 
@@ -77,27 +82,33 @@ module.exports = {
         }
 
         res.sendSuccess(result)
-    },
+    }
 
-    clearCart: async (req, res) => {
-        const cartId = req.params.cid
-
-        const result = await cartsDAO.clearCart(cartId)
-        if(!result) {
-            return res.sendError("Something went wrong!")
+    async clearCart(req, res) {
+        try{
+            const cartId = req.params.cid
+            console.log("CARTID CONTROLLER => ", cartId)
+            const result = await this.service.clearCart(cartId)
+            console.log("REULT CONTROLLER => ", result)
+            res.sendSuccess(result)
         }
-
-        res.sendSuccess(result)
-    },
-
-    deleteCart: async (req, res) => {
-        const cartId = req.params.cid
-
-        const result = await cartsDAO.deleteCart(cartId)
-        if(!result) {
-            return res.sendError("Something went wrong!")
+        catch(err) {
+            console.log(err)
+            res.sendError(err.message)
         }
+    }
 
-        res.sendSuccess(result)
+    async deleteCart(req, res) {
+        try {
+            const cartId = req.params.cid
+            const result = await this.service.deleteCart(cartId)
+
+            res.sendSuccess(result)
+        }
+        catch (err) {
+            res.sendError(err.message)
+        }
     }
 }
+
+module.exports = { CartsController }

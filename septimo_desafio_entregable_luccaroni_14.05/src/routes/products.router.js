@@ -1,5 +1,4 @@
 const { Router } = require("express")
-const productsController = require("../controllers/products.controller")
 
 const { ProductsDAO } = require("../dao/mongo/products.dao")
 const dao = new ProductsDAO()
