@@ -10,15 +10,7 @@ class CartsController {
         try {
             const result = await this.service.getCarts()
 
-
-            // Transformacion de carts usando DTO
-            const cartsTransformed = result.map(c => {
-                const dto = new CartsDTO(c)
-                const transformation = dto.trasnformOneCart()
-                return transformation
-            })
-
-            res.sendSuccess(cartsTransformed)
+            res.sendSuccess(result)
         }
         catch (err) {
             res.sendError(err.message)
@@ -30,11 +22,8 @@ class CartsController {
             const id = req.params.cid
             const cart = await this.service.getCartById(id)
 
-            // Transformacion de cart usando DTO
-            const dto = new CartsDTO(cart)
-            const cartTransformed = dto.trasnformOneCart()
-
-            res.sendSuccess(cartTransformed)
+            console.log("CART => ", cart)
+            return cart
         }
         catch (err) {
             res.sendError(err.message)
@@ -45,12 +34,7 @@ class CartsController {
         try {
             const newCart = await this.service.createCart()
 
-            // Transformacion de cart usando DTO
-            const dto = new CartsDTO(newCart)
-            const cartTransformed = dto.trasnformOneCart()
-
-
-            res.sendSuccess(cartTransformed)
+            res.sendSuccess(newCart)
         }
         catch (err) {
             res.sendError(err.message)

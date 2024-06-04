@@ -18,7 +18,7 @@ class ProductsDTO {
         return {
             id: this.id,
             title: this.title,
-            decription: this.description,
+            description: this.description,
             price: this.price,
             thumbnail: this.thumbnail,
             stock: this.stock,

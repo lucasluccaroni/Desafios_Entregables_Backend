@@ -17,8 +17,13 @@ module.exports = () => {
         controller.getCarts(req, res)
     })
 
-    router.get("/:cid", (req, res) => {
-        controller.getCartById(req, res)
+    router.get("/:cid",  async (req, res) => {
+        const cart = await controller.getCartById(req, res)
+
+        res.render("cart", {
+            title: "Cart",
+            cart
+        })
     })
 
     router.post("/", (req, res) => {

@@ -1,5 +1,4 @@
 const CartModel = require("../models/cart.model")
-const ProductModel = require("../models/product.model")
 
 class CartsDAO {
 
@@ -86,15 +85,6 @@ class CartsDAO {
 
     async deleteProductFromExistingCart(cartId, productId) {
         try {
-            // const cart = await CartModel.findOne({ _id: cartId })
-            // console.log("CARRITO ENCONTRADO => ", cart)
-            // if (!cart) throw new Error('cart not found');
-
-            // const product = await ProductModel.findOne({ _id: productId })
-            // product.toObject()
-            // console.log("PRODUCTO ENCONTRADO => ", product)
-            // if (!product) throw new Error('product not found');
-
             const cartUpdate = await CartModel.updateOne({ _id: cartId }, { $pull: { products: { _id: productId } } })
             return cartUpdate
 

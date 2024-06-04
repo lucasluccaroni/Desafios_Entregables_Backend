@@ -20,20 +20,20 @@ class CartsService {
             throw new Error("Someting went wrong!")
         }
 
-        // // Transformacion de carts usando DTO
-        // const cartsTransformed = carts.map(c => {
-        //     const dto = new CartsDTO(c)
-        //     const transformation = dto.trasnform()
-        //     return transformation
-        // })
+        // Transformacion de carts usando DTO
+        const cartsTransformed = carts.map(c => {
+            const dto = new CartsDTO(c)
+            const transformation = dto.trasnformOneCart()
+            return transformation
+        })
 
-        // return cartsTransformed
-        return carts
+        return cartsTransformed
+        // return carts
     }
 
     async getCartById(id) {
         const cart = await this.dao.getCartById(id)
-        console.log("RESPUESTA getCartById DAO => ", cart)
+        // console.log("RESPUESTA getCartById DAO => ", cart)
 
         if (cart === false) {
             throw new Error("Cart not found!")
@@ -42,7 +42,11 @@ class CartsService {
             throw new Error("Invalid caracters")
         }
 
-        return cart
+        // Transformacion de cart usando DTO
+        const dto = new CartsDTO(cart)
+        const cartTransformed = dto.trasnformOneCart()
+
+        return cartTransformed
     }
 
     async createCart() {
@@ -52,12 +56,11 @@ class CartsService {
             throw new Error("Someting went wrong!")
         }
 
-        // // Transformacion de cart usando DTO
-        // const dto = new CartsDTO(result)
-        // const cartTransformed = dto.trasnform()
+        // Transformacion de cart usando DTO
+        const dto = new CartsDTO(result)
+        const cartTransformed = dto.trasnformOneCart()
 
-        // return cartTransformed
-        return result
+        return cartTransformed
     }
 
     async addProductToExistingCart(cartId, productId, quantity) {
