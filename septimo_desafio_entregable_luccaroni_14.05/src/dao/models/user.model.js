@@ -18,6 +18,10 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true
+    },
     cart: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Cart"

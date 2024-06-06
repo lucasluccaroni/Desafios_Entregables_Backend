@@ -6,7 +6,7 @@ const expressHandlebars = require("express-handlebars")
 const { configureCustomResponses } = require("./controllers/utils")
 const createProductsRouter = require("./routes/products.router")
 const createCartsRouter = require("./routes/carts.router")
-// const createSessionsRouter = require("./routes/sessions.router")
+const createSessionsRouter = require("./routes/sessions.router")
 const createViewsRouter = require("./routes/views.router")
 const app = express()
 
@@ -32,10 +32,10 @@ const main = async () => {
     await mongoose.connect(mongoUri, { dbName })
 
     const routers = [
-        // { path: "api/sessions", createRouter: createSessionsRouter },
+        { path: "api/sessions", createRouter: createSessionsRouter },
         { path: "/", createRouter: createViewsRouter},
         { path: "/api/products", createRouter: createProductsRouter },
-        { path: "/api/carts", createRouter: createCartsRouter }
+        { path: "/api/carts", createRouter: createCartsRouter },
     ]
 
     for (const { path, createRouter } of routers) {
