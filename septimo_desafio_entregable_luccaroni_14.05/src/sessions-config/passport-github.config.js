@@ -2,6 +2,8 @@ const passport = require("passport")
 const { Strategy } = require("passport-github2")
 const User = require("../dao/models/user.model")
 const { clientID, clientSecret, callbackURL } = require("./github.private")
+const { CartsDAO } = require("../dao/mongo/carts.dao")
+const cartsDAO = new CartsDAO()
 
 
 const initializeStrategy = () => {
@@ -28,7 +30,7 @@ const initializeStrategy = () => {
             const lastName = fullName.substring(fullName.lastIndexOf(' ') + 1)
             console.log( "FIRSTNAME:", firstName,  "LASTNAME: ", lastName)
 
-            
+            const newCart = await cartsDAO.createCart()
             const newUser = {
                 firstName,
                 lastName,
@@ -36,7 +38,7 @@ const initializeStrategy = () => {
                 email: profile._json.email,
                 password: "",
                 role: "user",
-                // cart: "id"
+                cart: newCart.id
             }
             const result = await User.create(newUser)
             done(null, result)

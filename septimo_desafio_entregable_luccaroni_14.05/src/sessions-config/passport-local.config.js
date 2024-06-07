@@ -3,6 +3,9 @@ const { Strategy } = require("passport-local")
 const User = require("../dao/models/user.model")
 const hashingUtils = require("../utils/hashing")
 
+const { CartsDAO } = require("../dao/mongo/carts.dao")
+const cartsDAO = new CartsDAO()
+
 const initializeStrategy = () => {
 
     // REGISTER
@@ -15,30 +18,32 @@ const initializeStrategy = () => {
         const { firstName, lastName, age, email, } = req.body
 
         try {
-            const user = await User.findOne( { email: username } )
-            if(user) {
+            const user = await User.findOne({ email: username })
+            if (user) {
                 // error, usuario con es mail ya existe
                 // No hubo un error a nivel aplicacion, solo que el email ya esta usado y la ejecucion del register terminaría aca
-                return done(null, false) 
+                return done(null, false)
             }
 
+            // Se le crea un carrito vacio
+            const newCart = await cartsDAO.createCart()
             const newUser = {
                 firstName,
                 lastName,
                 age: +age,
                 email,
                 password: hashingUtils.hashPassword(password),
-                // cart: "id"
+                cart: newCart.id
             }
 
             const result = await User.create(newUser)
-            
+
             // usuario nuevo creado exitosamente
             return done(null, result)
-            
+
         }
-        catch(err) {
-            // error inesperado
+        catch (err) {
+            console.log(err)
             done("Error al obtener el usuario ", err)
         }
     }))
@@ -51,26 +56,26 @@ const initializeStrategy = () => {
 
     }, async (username, password, done) => {
 
-        try{
+        try {
 
-            if( !username || !password ) {
+            if (!username || !password) {
                 return done(null, false)
             }
-            
-        
+
+
             // 1. Verificar que el usuario exista en la BD - HECHO
-            const user = await User.findOne( { email: username } )
-        
-            if(!user) {
-                return done(null, false)
-            }
-        
-            //2. Validar password
-            if(!hashingUtils.isValidPassword(password, user.password)){
+            const user = await User.findOne({ email: username })
+
+            if (!user) {
                 return done(null, false)
             }
 
-            
+            //2. Validar password
+            if (!hashingUtils.isValidPassword(password, user.password)) {
+                return done(null, false)
+            }
+
+
             // exito, se devuelve el user.
             return done(null, user)
 
@@ -82,13 +87,13 @@ const initializeStrategy = () => {
 
 
     // SERIALIZER
-    passport.serializeUser( (user, done) => {
+    passport.serializeUser((user, done) => {
         console.log("serialized!", user)
         done(null, user._id)
     })
 
     // DESERIALIZER
-    passport.deserializeUser( async (id, done) => {
+    passport.deserializeUser(async (id, done) => {
         console.log("DEserialized!", id)
         const user = await User.findById(id)
         done(null, user)

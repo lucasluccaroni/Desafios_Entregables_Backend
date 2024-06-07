@@ -1,7 +1,8 @@
 const { Router } = require("express")
-const { userIsLoggedIn, userIsNotLoggedIn, } = require("../middlewares/auth.middleware")
+const { userIsLoggedIn, userIsNotLoggedIn, userIsAdmin } = require("../middlewares/auth.middleware")
 const User = require("../dao/models/user.model")
-
+const { UsersDAO } = require("../dao/mongo/users.dao")
+const usersDAO = new UsersDAO()
 
 module.exports = () => {
 
@@ -68,7 +69,7 @@ module.exports = () => {
 
             // Si el _id != 1 , busco en la DB el user, traigo sus datos y los renderizo.
         } else {
-            const user = await User.findOne(({ _id: idFromSession }))
+            const user = await usersDAO.getUserById(idFromSession)
             res.render("profile", {
                 title: "My Profile",
                 user: {
