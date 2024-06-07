@@ -28,7 +28,7 @@ const initializeStrategy = () => {
                 age: +age,
                 email,
                 password: hashingUtils.hashPassword(password),
-                cart: "id"
+                // cart: "id"
             }
 
             const result = await User.create(newUser)
