@@ -1,7 +1,6 @@
 const { Router } = require("express")
 const passport = require("passport")
 const { userIsAdmin, userIsLoggedIn } = require("../middlewares/auth.middleware")
-const { isValidPassword, hashPassword } = require("../utils/hashing")
 const User = require("../dao/models/user.model")
 
 const { UsersDAO } = require("../dao/mongo/users.dao")
@@ -21,8 +20,21 @@ module.exports = () => {
     const router = Router()
 
 
-    router.get("/current", async (req, res) => {
-        console.log("Info de session CURRENT => ", req.session.user)
+    router.get("/current", userIsLoggedIn, async (req, res) => {
+        console.log("Info de session en Current: ", req.session.user)
+        const idFromSession = req.session.user.id
+        console.log("ID SESSION => ", idFromSession)
+    
+    
+        // Si tiene _id: 1 (porque es admin), importo los datos de admin y los renderizo.
+        if(idFromSession == 1){
+            const user = req.session.user
+            res.send(user)
+    
+        // Si el _id != 1 , busco en la DB el user, traigo sus datos y los renderizo.
+        } else {
+            controller.getUserById(req, res)
+        }
     })
 
     // REGISTER FORM

@@ -21,9 +21,9 @@ class SessionsService {
 
 
             // Hasheo la contraseña
-            const hashedPassword  = hashPassword(password)
+            const hashedPassword = hashPassword(password)
             // Actuializo la nueva contraseña
-            const resetPassword = await this.dao.resetUserPassword(email, hashedPassword )
+            const resetPassword = await this.dao.resetUserPassword(email, hashedPassword)
 
             return resetPassword
         }
@@ -31,6 +31,11 @@ class SessionsService {
             console.log(err)
             throw new Error(err)
         }
+    }
+
+    async getUseById(id) {
+            const user = this.dao.getUserById(id)
+            return user
     }
 }
 
