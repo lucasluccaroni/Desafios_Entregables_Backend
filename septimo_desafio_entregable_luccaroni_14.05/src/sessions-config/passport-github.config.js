@@ -1,7 +1,7 @@
 const passport = require("passport")
 const { Strategy } = require("passport-github2")
 const User = require("../dao/models/user.model")
-const { clientID, clientSecret, callbackURL } = require("./github.private")
+const { clientID, callbackURL, clientSecret } = require("../config")
 const { CartsDAO } = require("../dao/mongo/carts.dao")
 const cartsDAO = new CartsDAO()
 
@@ -16,19 +16,19 @@ const initializeStrategy = () => {
     }, async (accessToken, refreshToken, profile, done) => {
 
         try {
-            console.log("Profile GITHUB => ", profile,  "GITHUB JSON => ", profile._json)
+            console.log("Profile GITHUB => ", profile, "GITHUB JSON => ", profile._json)
 
-            const user = await User.findOne( {email: profile._json.email } )
-            if(user){
+            const user = await User.findOne({ email: profile._json.email })
+            if (user) {
                 return done(null, user)
             }
-            
+
 
             // Crear el usuario si no existe
             const fullName = profile._json.name
             const firstName = fullName.substring(0, fullName.lastIndexOf(' '))
             const lastName = fullName.substring(fullName.lastIndexOf(' ') + 1)
-            console.log( "FIRSTNAME:", firstName,  "LASTNAME: ", lastName)
+            console.log("FIRSTNAME:", firstName, "LASTNAME: ", lastName)
 
             const newCart = await cartsDAO.createCart()
             const newUser = {
