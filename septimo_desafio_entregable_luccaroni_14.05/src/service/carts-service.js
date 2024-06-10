@@ -131,7 +131,7 @@ class CartsService {
 
         // Verificacion si el producto ya esta en el carrito
         let found = cart.products.find(productToAdd => {
-            return (productToAdd._id.toString() === productId)
+            return (productToAdd.id.toString() === productId)
         })
 
         // Si está, primero verifico si tiene el stock solicitado antes de actualizar la cantidad.
