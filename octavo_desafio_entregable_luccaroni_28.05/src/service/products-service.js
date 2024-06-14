@@ -1,6 +1,9 @@
 // Service - Repository
 const { ProductsDTO } = require("../dao/dtos/products.dto")
 const ProductModel = require("../dao/models/product.model")
+const { CustomError } = require("./errors/CustomError")
+const { ErrorCodes } = require("./errors/errorCodes")
+const { generateInvalidProductDataError } = require("./errors/errors")
 
 class ProductsService {
     constructor(dao) {
@@ -46,7 +49,13 @@ class ProductsService {
         const product = await this.dao.getProductById(id)
         console.log("RESPUESTA PRODUCT DAO => ", product)
         if (product === false) {
-            throw new Error("Product not found!")
+            // throw new Error("Product not found!")
+            throw CustomError.createError({
+                name: "Not Found",
+                cause: generateInvalidProductDataError({id}),
+                message: "Product not found in Database.",
+                code: ErrorCodes.NOT_FOUND
+            })
 
         } else if (product === null) {
             throw new Error("Invalid caracters")

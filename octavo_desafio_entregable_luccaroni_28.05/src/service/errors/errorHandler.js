@@ -28,6 +28,11 @@ const errorHandler = (error, req, res, next) => {
             res.status(401).json({status: "Error", error: error.name, cause: error.cause})
             break
         
+        case ErrorCodes.NOT_FOUND:
+            console.log("ERROR CODE SWITCH => ", error.code)
+            res.status(404).json({status: "Error", error: error.name, cause: error.cause})
+            break
+        
         default:
             console.log("ERROR CODE SWITCH => ", error.code)
             res.status(500).json({status: "Error", error: error.name, cause: error.cause})
