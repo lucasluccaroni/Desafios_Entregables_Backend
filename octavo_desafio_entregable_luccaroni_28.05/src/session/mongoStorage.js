@@ -6,7 +6,7 @@ const { dbName, mongoUri } = require("../config/index")
 const storage = MongoStore.create({
     dbName,
     mongoUrl: mongoUri,
-    ttl: 300
+    ttl: 1000
 })
 
 module.exports = session({

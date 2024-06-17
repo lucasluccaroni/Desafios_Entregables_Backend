@@ -12,8 +12,8 @@ class UsersController {
             return resetPassword
         }
         catch (err) {
-            console.log("CATCH EN CONTROLLER - resetPassword", err)
-            res.sendError(err.message)
+            // console.log("CATCH EN CONTROLLER - resetPassword", err)
+            res.status(err.code).json(err)
         }
     }
 

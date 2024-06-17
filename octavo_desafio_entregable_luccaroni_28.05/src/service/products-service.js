@@ -3,7 +3,8 @@ const { ProductsDTO } = require("../dao/dtos/products.dto")
 const ProductModel = require("../dao/models/product.model")
 const { CustomError } = require("./errors/CustomError")
 const { ErrorCodes } = require("./errors/errorCodes")
-const { generateInvalidProductDataError } = require("./errors/errors")
+const { generateInvalidProductIdError, generateInvalidProductDataError } = require("./errors/errors")
+const errors = require("./errors/errors")
 
 class ProductsService {
     constructor(dao) {
@@ -46,19 +47,34 @@ class ProductsService {
 
     async getProductById(id) {
 
+        if (id.length < 24) {
+            throw CustomError.createError({
+                name: "Not Found <24",
+                cause: "Product Not Found in Database",
+                message: errors.generateInvalidProductIdError({ id }),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
+        }
+
         const product = await this.dao.getProductById(id)
-        console.log("RESPUESTA PRODUCT DAO => ", product)
+        // console.log("RESPUESTA PRODUCT DAO => ", product)
+
         if (product === false) {
             // throw new Error("Product not found!")
             throw CustomError.createError({
-                name: "Not Found",
-                cause: generateInvalidProductDataError({id}),
-                message: "Product not found in Database.",
+                name: "Not Found false",
+                cause: "Product not found in Database.",
+                message: errors.generateInvalidProductIdError({ id }),
                 code: ErrorCodes.NOT_FOUND
             })
 
         } else if (product === null) {
-            throw new Error("Invalid caracters")
+            throw CustomError.createError({
+                name: "Invalid Data",
+                cause: "Product not found in Database.",
+                message: errors.generateInvalidProductIdError({ id }),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
         // Transformacion de producto usando DTO
@@ -71,11 +87,26 @@ class ProductsService {
     async addProduct(productData) {
 
         const { title, description, code, price, status, stock, category, thumbnail } = productData
-        if (!title || !code || price < 0 || stock < 0 || !category || !description) {
-            throw new Error("Invalid parameters")
+
+        if (!title || !code || price < 0 || !price || stock < 0 || !category || !description || !status) {
+            throw CustomError.createError({
+                name: "Invalid Data",
+                cause: "Error trying to create a new Product. Try again.",
+                message: errors.generateInvalidProductDataError(),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
-        return await this.dao.addProduct(productData)
+        const newProduct = await this.dao.addProduct(productData)
+        if (!newProduct) {
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: errors.databaseProblem(),
+                code: ErrorCodes.DATABASE_ERROR
+            })
+        }
+        return newProduct
     }
 
     async updateProduct(id, productData) {
@@ -85,20 +116,34 @@ class ProductsService {
         // console.log("DATAKEYS =>", dataKeys)
 
         if (!dataKeys.includes("title") && !dataKeys.includes("description") && !dataKeys.includes("price") && !dataKeys.includes("stock") && !dataKeys.includes("status")) {
-            throw new Error("Invalid property")
+            throw CustomError.createError({
+                name: "Invalid Data",
+                cause: "Error trying to update a Product. Try again.",
+                message: errors.generateInvalidProductDataError(),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
         const productToUpdate = await this.dao.getProductById(id)
         console.log("PRODUCT FOUND SERVICE", productToUpdate)
 
-
         if (!productToUpdate) {
-            throw new Error("Product not found!")
+            throw CustomError.createError({
+                name: "Not Found update",
+                cause: "Product not found in Database.",
+                message: generateInvalidProductIdError({ id }),
+                code: ErrorCodes.NOT_FOUND
+            })
         }
 
         const updatedProduct = await this.dao.updateProduct(id, productData)
         if (!updatedProduct) {
-            throw new Error("Error updating product!")
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: errors.databaseProblem(),
+                code: ErrorCodes.DATABASE_ERROR
+            })
         }
 
         return updatedProduct
@@ -109,11 +154,21 @@ class ProductsService {
         const deletedProduct = await this.dao.deleteProduct(id)
 
         if (!deletedProduct) {
-            throw new Error("Something went wrong!")
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: generateInvalidProductIdError({ id }),
+                code: ErrorCodes.DATABASE_ERROR
+            })
 
         } else if (deletedProduct.deletedCount == 0) {
             console.log("DELETED PRODUCT SERVICE", deletedProduct.deletedCount)
-            throw new Error("Product not found!")
+            throw CustomError.createError({
+                name: "Not Found",
+                cause: "Product not found in Database.",
+                message: generateInvalidProductIdError({ id }),
+                code: ErrorCodes.NOT_FOUND
+            })
         }
 
         console.log("DELETED PRODUCT SERVICE", deletedProduct.deletedCount)

@@ -61,12 +61,13 @@ const main = async () => {
         app.use(path, await createRouter())
     }
 
-    app.use(errorHandler)
-
-
+    // app.use(errorHandler)
+    
+    
     app.listen(port, () => {
         console.log(`CoderServer Ready - port: ${port}`)
     })
 }
+
 
 main()

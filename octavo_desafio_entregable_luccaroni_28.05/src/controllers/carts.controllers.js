@@ -13,7 +13,7 @@ class CartsController {
             res.sendSuccess(result)
         }
         catch (err) {
-            res.sendError(err.message)
+            res.status(err.code).send(err)
         }
     }
 
@@ -26,7 +26,7 @@ class CartsController {
             return cart
         }
         catch (err) {
-            res.sendError(err.message)
+            res.status(err.code).send(err)
         }
     }
 
@@ -37,7 +37,7 @@ class CartsController {
             res.sendSuccess(newCart)
         }
         catch (err) {
-            res.sendError(err.message)
+            res.status(err.code).send(err)
         }
     }
 
@@ -58,7 +58,7 @@ class CartsController {
             res.sendSuccess(result)
         }
         catch (err) {
-            res.sendError(err.message)
+            res.status(err.code).send(err)
         }
     }
 
@@ -67,15 +67,17 @@ class CartsController {
             const cartId = req.params.cid
             const productId = req.params.pid
             const { quantity } = req.body
+            const userInfo = req.session.user
+
             console.log("PRODUCT QUANTITY CONTROLLER => ", quantity)
 
-            const result = await this.service.updateProductFromExistingCart(cartId, productId, quantity)
+            const result = await this.service.updateProductFromExistingCart(cartId, productId, quantity, userInfo)
 
             res.sendSuccess(result)
         }
         catch (err) {
-            console.log(err)
-            res.sendError(err.message)
+            // console.log(err)
+            res.status(err.code).send(err)
         }
 
     }
@@ -90,8 +92,8 @@ class CartsController {
             res.sendSuccess(result)
         }
         catch (err) {
-            console.log(err)
-            res.sendError(err.message)
+            // console.log(err)
+            res.status(err.code).send(err)
         }
     }
 
@@ -104,8 +106,8 @@ class CartsController {
             res.sendSuccess(result)
         }
         catch (err) {
-            console.log(err)
-            res.sendError(err.message)
+            // console.log(err)
+            res.status(err.code).send(err)
         }
     }
 
@@ -117,7 +119,8 @@ class CartsController {
             res.sendSuccess(result)
         }
         catch (err) {
-            res.sendError(err.message)
+            // res.sendError(err.message)
+            res.status(err.code).send(err)
         }
     }
 
@@ -131,8 +134,9 @@ class CartsController {
             res.sendSuccess(result)
         }
         catch(err){
-            console.log("ERROR EN CONTROLLER - purchaseCart => ", err)
-            res.sendError(err.message)
+            // console.log("ERROR EN CONTROLLER - purchaseCart => ", err)
+            // res.sendError(err.message)
+            res.status(err.code).send(err)
         }
     }
 }

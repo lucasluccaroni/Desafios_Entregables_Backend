@@ -1,24 +1,36 @@
 const { hashPassword } = require("../utils/hashing")
 
+const { ErrorCodes } = require("./errors/errorCodes")
+const { CustomError } = require("./errors/CustomError")
+const errors = require("./errors/errors")
+
 class UsersService {
     constructor(dao) {
         this.dao = dao
     }
 
     async resetPassword(email, password) {
-        try {
 
             // Verifico que se haya ingresado email y password
             if (!email || !password) {
-                throw new Error("Invalid Credentials!")
+                throw CustomError.createError({
+                    name: "Invalid Credentials",
+                    cause: "Missing or Wrong credentials.",
+                    message: errors.generateInvalidCredentialsError(email, password),
+                    code: ErrorCodes.INVALID_TYPES_ERROR
+                })
             }
 
             // Busco al usuario
             const user = await this.dao.getUserByEmail(email)
             if (!user) {
-                throw new Error("User not found!")
+                throw CustomError.createError({
+                    name: "Not Found ",
+                    cause: "User Not Found in Database",
+                    message: errors.generateInvalidUserIdError(email),
+                    code: ErrorCodes.INVALID_TYPES_ERROR
+                })
             }
-
 
             // Hasheo la contraseña
             const hashedPassword = hashPassword(password)
@@ -26,16 +38,11 @@ class UsersService {
             const resetPassword = await this.dao.resetUserPassword(email, hashedPassword)
 
             return resetPassword
-        }
-        catch (err) {
-            console.log(err)
-            throw new Error(err)
-        }
     }
 
     async getUserById(id) {
-            const user = this.dao.getUserById(id)
-            return user
+        const user = this.dao.getUserById(id)
+        return user
     }
 }
 

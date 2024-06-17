@@ -14,7 +14,7 @@ class ProductsController {
 
             // Category y stock
             let query = {}
-            if(req.query.category) {
+            if (req.query.category) {
                 query.category = req.query.category
 
             } else if (req.query.stock) {
@@ -42,7 +42,7 @@ class ProductsController {
         }
         catch (err) {
             console.log("CATCH EN CONTROLLER - getProductById => ", err)
-            res.sendError(err.message)
+            res.json({ error: err })
         }
     }
 
@@ -51,13 +51,14 @@ class ProductsController {
             const productData = req.body
 
             const newProduct = await this.service.addProduct(productData)
-            console.log("NEW PRODUCT CONTROLLER => ", newProduct)
+            // console.log("NEW PRODUCT CONTROLLER => ", newProduct)
+
 
             res.sendSuccess(newProduct)
         }
         catch (err) {
-            console.log("CATCH EN CONTROLLER - addProduct => ", err)
-            res.sendError(err.message)
+            // console.log("CATCH EN CONTROLLER - addProduct => ", err)
+            res.status(err.code).send(err)
         }
     }
 
@@ -71,8 +72,9 @@ class ProductsController {
             res.sendSuccess("Product updated succesfully")
         }
         catch (err) {
-            console.log("CATCH EN CONTROLLER - updateProduct => ", err)
-            res.sendError(err.message)
+            // console.log("CATCH EN CONTROLLER - updateProduct => ", err)
+            console.log(err.code)
+            res.status(err.code).send(err)
         }
     }
 
@@ -84,8 +86,8 @@ class ProductsController {
             res.sendSuccess(`Product succesfully deleted`)
         }
         catch (err) {
-            console.log("CATCH EN CONTROLLER - deleteProduct => ", err)
-            res.sendError(err.message)
+            // console.log("CATCH EN CONTROLLER - deleteProduct => ", err)
+            res.status(err.code).send(err)
         }
     }
 }

@@ -4,14 +4,14 @@ class ProductsDAO {
 
 
     async getProducts() {
-        try {
+        // try {
             const products = await ProductModel.find()
             return products.map(p => p.toObject())
-        }
-        catch (err) {
-            console.log("Error en ProductsDAO - getProducts => ", err)
-            return null
-        }
+        // }
+        // catch (err) {
+        //     console.log("Error en ProductsDAO - getProducts => ", err)
+        //     return null
+        // }
     }
 
     async getProductById(id) {
@@ -20,9 +20,30 @@ class ProductsDAO {
             return product?.toObject() ?? false
         }
         catch (err) {
-            console.log("Error en ProductsDAO - getProductById => ", err)
+            // console.log("Error en ProductsDAO - getProductById => ", err)
             return null
         }
+        // const product = await ProductModel.findById(id)
+        // console.log("PRODUCT => ", product)
+
+        // if (product) {
+        //     const productObject = product.toObject()
+        //     // console.log("PRODUCT TO OBJECT => ", productObject)
+
+
+        //     if (productObject !== null && productObject !== undefined) {
+        //     // console.log("PRODUCT TO OBJECT => ", productObject)
+
+        //         return productObject
+
+        //     } else {
+        //         // console.log("false")
+        //         return false
+        //     }
+        // } else {
+        //     // console.log("Error en ProductsDAO - getProductById => Producto no encontrado")
+        //     return null
+        // }
     }
 
     async addProduct(product) {
@@ -31,7 +52,7 @@ class ProductsDAO {
             return productToAdd.toObject()
         }
         catch (err) {
-            console.log("Error en ProductsDAO - addProduct => ", err)
+            // console.log("Error en ProductsDAO - addProduct => ", err)
             return null
         }
     }
@@ -42,7 +63,7 @@ class ProductsDAO {
             return result
         }
         catch (err) {
-            console.log("Error en ProductsDAO - updateProduct => ", err)
+            // console.log("Error en ProductsDAO - updateProduct => ", err)
             return null
         }
     }
@@ -53,7 +74,7 @@ class ProductsDAO {
             return result
         }
         catch (err) {
-            console.log("Error en ProductsDAO - deleteProduct => ", err)
+            // console.log("Error en ProductsDAO - deleteProduct => ", err)
             return null
         }
     }

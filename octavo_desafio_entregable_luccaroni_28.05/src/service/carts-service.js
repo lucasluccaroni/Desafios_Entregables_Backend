@@ -16,6 +16,10 @@ const usersService = new UsersService(usersDAO)
 const { CartsDTO } = require("../dao/dtos/carts.dto")
 const TicketModel = require("../dao/models/ticket.model")
 
+const { ErrorCodes } = require("./errors/errorCodes")
+const { CustomError } = require("./errors/CustomError")
+const errors = require("./errors/errors")
+
 class CartsService {
     constructor(dao) {
         this.dao = dao
@@ -24,7 +28,12 @@ class CartsService {
     async getCarts() {
         const carts = await this.dao.getCarts()
         if (!carts) {
-            throw new Error("Someting went wrong!")
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: errors.databaseProblem(),
+                code: ErrorCodes.DATABASE_ERROR
+            })
         }
 
         // Transformacion de carts usando DTO
@@ -39,14 +48,35 @@ class CartsService {
     }
 
     async getCartById(id) {
+
+        if (id.length < 24) {
+            throw CustomError.createError({
+                name: "Not Found <24",
+                cause: "Cart Not Found in Database",
+                message: errors.generateInvalidCartIdError({ id }),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
+        }
+
         const cart = await this.dao.getCartById(id)
         // console.log("RESPUESTA getCartById DAO => ", cart)
 
         if (cart === false) {
-            throw new Error("Cart not found!")
+            // throw new Error("Cart not found!")
+            throw CustomError.createError({
+                name: "Not Found false",
+                cause: "Cart not found in Database.",
+                message: errors.generateInvalidCartIdError({ id }),
+                code: ErrorCodes.NOT_FOUND
+            })
 
         } else if (cart === null) {
-            throw new Error("Invalid caracters")
+            throw CustomError.createError({
+                name: "Invalid Data",
+                cause: "Cart not found in Database.",
+                message: errors.generateInvalidProductIdError({ id }),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
         // Transformacion de cart usando DTO
@@ -60,7 +90,12 @@ class CartsService {
         const result = await this.dao.createCart()
 
         if (!result) {
-            throw new Error("Someting went wrong!")
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: errors.databaseProblem(),
+                code: ErrorCodes.DATABASE_ERROR
+            })
         }
 
         // Transformacion de cart usando DTO
@@ -71,76 +106,109 @@ class CartsService {
     }
 
     async addProductToExistingCart(cartId, productId, quantity, userInfo) {
-        try {
-            let productExistInCart
+        // try {
+        let productExistInCart
 
-            // Busco el carrito
-            const cart = await CartModel.findOne({ _id: cartId })
-            if (!cart) {
-                throw new Error("Cart not found!")
-            }
-            console.log("CARRITO ENCONTRADO => ", cart)
-
-            // Busco el carrito que le corresponde al User cuando se registró
-            const user = await usersService.getUserById(userInfo.id)
-            console.log("USER ENCONTRADO EN CARTS-SERVICE => ", user)
-
-            const userCart = user.cart.toString()
-            console.log("USER CART => ", userCart)
-
-            // Comparo los carritos. El usuario registrado solo puede añadir carritos al carrito que le corresponde.
-            if (userCart !== cart.id) {
-                throw new Error("This cart isn't yours!")
-            }
-
-            // Busco el producto
-            const productToAdd = await ProductModel.findById(productId)
-            if (!productToAdd) {
-                throw new Error("Product not found!")
-            }
-            console.log("PRODUCTO ENCONTRADO => ", productToAdd)
-
-            // Busco si el producto ya existe en el carrito
-            let found = cart.products.find(productToAdd => {
-                return (productToAdd._id.toString() === productId)
+        // Busco el carrito
+        const cart = await CartModel.findOne({ _id: cartId })
+        if (!cart) {
+            throw CustomError.createError({
+                name: "Not Found",
+                cause: "Cart not found in Database.",
+                message: errors.generateInvalidCartIdError(cartId),
+                code: ErrorCodes.NOT_FOUND
             })
-            console.log("BUSQUEDA SERVICE => ", found)
+        }
+        console.log("CARRITO ENCONTRADO => ", cart)
 
-            // Si no existe, lo agrego al carrito
-            if (!found) {
+        // Busco el carrito que le corresponde al User cuando se registró
+        const user = await usersService.getUserById(userInfo.id)
+        console.log("USER ENCONTRADO EN CARTS-SERVICE => ", user)
 
-                // Verifico la cantidad actual, la que se quiere ingresar y el stock disponible
-                if (quantity < 0 || quantity > productToAdd.stock) {
-                    throw new Error("Wrong quantity")
-                }
+        const userCart = user.cart.toString()
+        console.log("USER CART => ", userCart)
 
-                productExistInCart = false
-                const cartUpdate = this.dao.addProductToExistingCart(productExistInCart, cartId, productId, quantity)
-                return cartUpdate
+        // Comparo los carritos. El usuario registrado solo puede añadir carritos al carrito que le corresponde.
+        if (userCart !== cart.id) {
+            throw CustomError.createError({
+                name: "This Cart in not yours!",
+                cause: "Cart not found in Database.",
+                message: errors.generateWrongCartError(cartId),
+                code: ErrorCodes.UNAUTHORIZED
+            })
+        }
 
-                // Si existe, sumo la cantidad ingresada + la que que tenia y actualizo el producto    
-            } else if (found) {
-                console.log("FOUND ENCONTRADO => ", found)
+        // Busco el producto
+        const productToAdd = await ProductModel.findById(productId)
+        if (productToAdd === false) {
+            throw CustomError.createError({
+                name: "Not Found false",
+                cause: "Product not found in Database.",
+                message: errors.generateInvalidProductIdError(productId),
+                code: ErrorCodes.NOT_FOUND
+            })
+        } else if (productToAdd === null) {
+            throw CustomError.createError({
+                name: "Invalid Data",
+                cause: "Product not found in Database.",
+                message: errors.generateInvalidProductIdError(productId),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
+        }
+        console.log("PRODUCTO ENCONTRADO => ", productToAdd)
 
-                // Verifico la cantidad actual, la que se quiere actualizar y el stock disponible
-                if (found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock) {
-                    throw new Error("Wrong quantity")
-                }
+        // Busco si el producto ya existe en el carrito
+        let found = cart.products.find(productToAdd => {
+            return (productToAdd._id.toString() === productId)
+        })
+        console.log("BUSQUEDA SERVICE => ", found)
 
-                quantity += found.quantity
-                productExistInCart = true
 
-                const cartUpdate = this.dao.addProductToExistingCart(productExistInCart, cartId, productId, quantity)
-                return cartUpdate
+        // Si no existe, lo agrego al carrito
+        if (!found) {
+
+            // Verifico la cantidad actual, la que se quiere ingresar y el stock disponible
+            if (quantity < 0 || quantity > productToAdd.stock) {
+                throw CustomError.createError({
+                    name: "Wrong quantity!",
+                    cause: "Wrong quantity!",
+                    message: errors.generateWrongQuantityError(quantity),
+                    code: ErrorCodes.INVALID_TYPES_ERROR
+                })
             }
+
+            productExistInCart = false
+            const cartUpdate = this.dao.addProductToExistingCart(productExistInCart, cartId, productId, quantity)
+            return cartUpdate
+
+            // Si existe, sumo la cantidad ingresada + la que que tenia y actualizo el producto    
+        } else if (found) {
+            console.log("FOUND ENCONTRADO => ", found)
+
+            // Verifico la cantidad actual, la que se quiere actualizar y el stock disponible
+            if (found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock) {
+                throw CustomError.createError({
+                    name: "Wrong quantity!",
+                    cause: "Wrong quantity!",
+                    message: errors.generateWrongQuantityError(quantity),
+                    code: ErrorCodes.INVALID_TYPES_ERROR
+                })
+            }
+
+            quantity += found.quantity
+            productExistInCart = true
+
+            const cartUpdate = this.dao.addProductToExistingCart(productExistInCart, cartId, productId, quantity)
+            return cartUpdate
         }
-        catch (err) {
-            console.log(err)
-            throw new Error(err)
-        }
+        // }
+        // catch (err) {
+        //     console.log(err)
+        //     throw new Error(err)
+        // }
     }
 
-    async updateProductFromExistingCart(cartId, productId, quantity) {
+    async updateProductFromExistingCart(cartId, productId, quantity, userInfo) {
 
         // Busco el carrito
         const cart = await this.getCartById(cartId)
@@ -154,7 +222,12 @@ class CartsService {
 
         // Comparo los carritos. El usuario registrado solo puede añadir carritos al carrito que le corresponde.
         if (userCart !== cart.id) {
-            throw new Error("This cart isn't yours!")
+            throw CustomError.createError({
+                name: "This Cart in not yours!",
+                cause: "Cart not found in Database.",
+                message: errors.generateWrongCartError(cartId),
+                code: ErrorCodes.UNAUTHORIZED
+            })
         }
 
         // Busco el producto
@@ -170,7 +243,12 @@ class CartsService {
 
             // Verifico la cantidad actual, la que se quiere actualizar y el stock disponible
             if (found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock) {
-                throw new Error("Wrong quantity")
+                throw CustomError.createError({
+                    name: "Wrong quantity!",
+                    cause: "Wrong quantity!",
+                    message: errors.generateWrongQuantityError(quantity),
+                    code: ErrorCodes.INVALID_TYPES_ERROR
+                })
             }
 
             found.quantity = quantity
@@ -180,7 +258,12 @@ class CartsService {
 
             // Si no está, arrojo un error
         } else if (!found) {
-            throw new Error("Product is not in cart!")
+            throw CustomError.createError({
+                name: "Not Found ",
+                cause: "Product not found in Cart.",
+                message: errors.generateInvalidProductIdError(productId),
+                code: ErrorCodes.NOT_FOUND
+            })
         }
     }
 
@@ -188,23 +271,40 @@ class CartsService {
 
         // Busco el carrito
         const cart = await this.getCartById(cartId)
+        console.log("CART => ", cart)
 
         // Busco el producto
         const productToDelete = await productsService.getProductById(productId)
+        console.log("PRODUCT TO DELETE => ", productToDelete)
 
         // Verificacion si el producto ya esta en el carrito
         let found = cart.products.find(productToDelete => {
-            return (productToDelete._id.toString() === productId)
+            return (productToDelete.id.toString() === productId)
         })
 
         // Si esta, actualizo el carrito quitando ese producto
         if (found) {
             const deleteProduct = await this.dao.deleteProductFromExistingCart(cartId, productToDelete.id)
+
+            if (!deleteProduct) {
+                throw CustomError.createError({
+                    name: "Database Error",
+                    cause: "Database problem caused failure in opreation",
+                    message: errors.databaseProblem(),
+                    code: ErrorCodes.DATABASE_ERROR
+                })
+            }
+
             return deleteProduct
 
             // Si no esta, arrojo un error
         } else if (!found) {
-            throw new Error("Product is not in cart!")
+            throw CustomError.createError({
+                name: "Not Found ",
+                cause: "Product not found in Cart.",
+                message: errors.generateInvalidProductIdError(productId),
+                code: ErrorCodes.NOT_FOUND
+            })
         }
     }
 
@@ -212,13 +312,23 @@ class CartsService {
 
         const cart = await CartModel.findOne({ _id: id })
         if (!cart) {
-            throw new Error('Cart not found!')
+            throw CustomError.createError({
+                name: "Not Found",
+                cause: "Cart not found in Database.",
+                message: errors.generateInvalidCartIdError(id),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
         const result = await this.dao.clearCart(id)
         console.log("RESULT SERVICE => ", result)
         if (!result) {
-            throw new Error("Something went wrong!")
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: errors.databaseProblem(),
+                code: ErrorCodes.DATABASE_ERROR
+            })
         }
 
         return result
@@ -229,11 +339,21 @@ class CartsService {
         const deletedCart = await this.dao.deleteCart(id)
 
         if (!deletedCart) {
-            throw new Error("Something went wrong!")
+            throw CustomError.createError({
+                name: "Database Error",
+                cause: "Database problem caused failure in opreation",
+                message: errors.databaseProblem(),
+                code: ErrorCodes.DATABASE_ERROR
+            })
 
         } else if (deletedCart.deletedCount == 0) {
-            console.log("DELETED PRODUCT SERVICE", deletedCart.deletedCount)
-            throw new Error("Product not found!")
+            console.log("DELETED CART SERVICE", deletedCart.deletedCount)
+            throw CustomError.createError({
+                name: "Not Found",
+                cause: "Cart not found in Database.",
+                message: errors.generateInvalidCartIdError(id),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
         console.log("DELETED PRODUCT SERVICE", deletedCart.deletedCount)
@@ -249,7 +369,12 @@ class CartsService {
 
         // Verifico que el carrito pertenezca al usuario
         if (user.cart.toString() !== cart.id) {
-            throw new Error("This cart isn't yours!")
+            throw CustomError.createError({
+                name: "This Cart in not yours!",
+                cause: "Cart not found in Database.",
+                message: errors.generateWrongCartError(cartId),
+                code: ErrorCodes.UNAUTHORIZED
+            })
         }
 
         // Inicializo el total de la compra
@@ -283,7 +408,6 @@ class CartsService {
 
         return ticket
     }
-
 }
 
 module.exports = { CartsService }

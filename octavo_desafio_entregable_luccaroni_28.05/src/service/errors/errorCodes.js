@@ -1,9 +1,9 @@
 const ErrorCodes = {
-    ROUTING_ERROR: 1,
-    INVALID_TYPES_ERROR: 2,
-    DATABASE_ERROR: 3,
-    UNAUTHORIZED: 4,
-    NOT_FOUND: 5
+    ROUTING_ERROR: 502,
+    INVALID_TYPES_ERROR: 400,
+    DATABASE_ERROR: 500,
+    UNAUTHORIZED: 401,
+    NOT_FOUND: 404
 }
 
 module.exports = { ErrorCodes }
