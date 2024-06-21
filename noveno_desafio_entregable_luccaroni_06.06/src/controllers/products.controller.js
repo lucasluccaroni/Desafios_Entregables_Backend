@@ -1,0 +1,92 @@
+class ProductsController {
+    constructor(service) {
+        this.service = service
+    }
+
+    async getProducts(req, res) {
+        try {
+            // Queries
+            const limit = req.query.limit || 10
+            const page = req.query.page || 1
+            const sort = req.query.sort // asc o desc
+
+            // Category y stock
+            let query = {}
+            if (req.query.category) {
+                query.category = req.query.category
+
+            } else if (req.query.stock) {
+                query.stock = req.query.stock
+            }
+
+            const products = await this.service.getProducts(query, sort, limit, page)
+
+            return products
+        }
+        catch (err) {
+            req.logger.fatal(err)
+            res.sendError(err.message)
+
+        }
+
+    }
+
+    async getProductById(req, res) {
+        try {
+            const id = req.params.pid
+            const product = await this.service.getProductById(id)
+
+            return product
+        }
+        catch (err) {
+            req.logger.error("CATCH EN CONTROLLER - getProductById => ", err)
+            res.json({ error: err })
+        }
+    }
+
+    async addProduct(req, res) {
+        try {
+            const productData = req.body
+
+            const newProduct = await this.service.addProduct(productData)
+            req.logger.info("NEW PRODUCT CONTROLLER => ", newProduct)
+
+            res.sendSuccess(newProduct)
+        }
+        catch (err) {
+            req.logger.fatal("CATCH EN CONTROLLER - addProduct => ", err)
+            res.status(err.code).send(err)
+        }
+    }
+
+    async updateProduct(req, res) {
+        try {
+            const id = req.params.pid
+            const productData = req.body
+
+            const updatedProduct = await this.service.updateProduct(id, productData)
+
+            res.sendSuccess("Product updated succesfully")
+        }
+        catch (err) {
+            req.logger.fatal("CATCH EN CONTROLLER - updateProduct => ", err)
+            req.logger.error(err.code)
+            res.status(err.code).send(err)
+        }
+    }
+
+    async deleteProduct(req, res) {
+        try {
+            const id = req.params.pid
+            const deletedProduct = await this.service.deleteProduct(id)
+
+            res.sendSuccess(`Product succesfully deleted`)
+        }
+        catch (err) {
+            req.logger.fatal("CATCH EN CONTROLLER - deleteProduct => ", err)            
+            res.status(err.code).send(err)
+        }
+    }
+}
+
+module.exports = { ProductsController }
