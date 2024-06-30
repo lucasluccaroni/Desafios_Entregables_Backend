@@ -36,7 +36,11 @@ module.exports = {
         return ` Some user data sent is incorrect or missing. Please check it before re-sending. Recieved: ${email} and ${password}` 
     },
 
-    generateInvalidUserIdError(email){
+    generateInvalidUserEmailError(email){
         return ` Invalid user data. ID: Should be an MongoObjectId. Recived: ${email} (${typeof email})`
+    },
+
+    generateInvalidUserIdError(id){
+        return ` Invalid user data. ID: Should be an MongoObjectId. Recived: ${id} (${typeof id})`
     }
 }

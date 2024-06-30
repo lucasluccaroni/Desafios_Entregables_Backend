@@ -10,5 +10,7 @@ module.exports = {
     clientID: process.env.CLIENT_ID_GITHUB,
     clientSecret: process.env.CLIENT_SECRET_GITHUB,
     callbackURL: process.env.CALLBACK_URL_GITHUB,
-    enviroment: process.env.NODE_ENV
+    enviroment: process.env.NODE_ENV,
+    userGmail: process.env.GMAIL_ACCOUNT,
+    passGmail: process.env.GMAIL_PASS
 }

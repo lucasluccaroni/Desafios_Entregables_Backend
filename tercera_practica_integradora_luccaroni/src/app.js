@@ -13,6 +13,7 @@ const createSessionsRouter = require("./routes/sessions.router")
 const createViewsRouter = require("./routes/views.router")
 const createMocksRouter = require("./routes/mocks.router")
 const createLoggerRouter = require("./routes/loggerTest.router")
+const createUsersRouter = require("./routes/users.router")
 
 const app = express()
 
@@ -59,7 +60,8 @@ const main = async () => {
         { path: "/api/products", createRouter: createProductsRouter },
         { path: "/api/carts", createRouter: createCartsRouter },
         { path: "/mockingproducts", createRouter: createMocksRouter },
-        {path: "/loggerTest", createRouter: createLoggerRouter}
+        {path: "/loggerTest", createRouter: createLoggerRouter},
+        {path: "/users", createRouter: createUsersRouter}
     ]
 
     for (const { path, createRouter } of routers) {

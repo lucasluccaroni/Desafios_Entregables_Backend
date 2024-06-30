@@ -1,3 +1,5 @@
+const { logger } = require("../logger/logger")
+
 class ProductsController {
     constructor(service) {
         this.service = service
@@ -48,7 +50,12 @@ class ProductsController {
         try {
             const productData = req.body
 
-            const newProduct = await this.service.addProduct(productData)
+            // Verifico que haya un mail de una sesion para asignar el owner. Si no, por defecto será 'admin'.
+            const userEmail = req.user 
+            ? req.user.email
+            : "admin"
+
+            const newProduct = await this.service.addProduct(productData, userEmail)
             req.logger.info("NEW PRODUCT CONTROLLER => ", newProduct)
 
             res.sendSuccess(newProduct)
@@ -83,7 +90,7 @@ class ProductsController {
             res.sendSuccess(`Product succesfully deleted`)
         }
         catch (err) {
-            req.logger.fatal("CATCH EN CONTROLLER - deleteProduct => ", err)            
+            req.logger.fatal("CATCH EN CONTROLLER - deleteProduct => ", err)
             res.status(err.code).send(err)
         }
     }

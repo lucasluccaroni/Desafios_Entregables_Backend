@@ -85,7 +85,7 @@ class ProductsService {
         return productTransformed
     }
 
-    async addProduct(productData) {
+    async addProduct(productData, userEmail) {
 
         const { title, description, code, price, status, stock, category, thumbnail } = productData
 
@@ -98,7 +98,7 @@ class ProductsService {
             })
         }
 
-        const newProduct = await this.dao.addProduct(productData)
+        const newProduct = await this.dao.addProduct(productData, userEmail)
         if (!newProduct) {
             throw CustomError.createError({
                 name: "Database Error",

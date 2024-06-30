@@ -1,12 +1,14 @@
 const ProductModel = require("../models/product.model")
+const { logger } = require("../../logger/logger")
+const productModel = require("../models/product.model")
 
 class ProductsDAO {
 
 
     async getProducts() {
         // try {
-            const products = await ProductModel.find()
-            return products.map(p => p.toObject())
+        const products = await ProductModel.find()
+        return products.map(p => p.toObject())
         // }
         // catch (err) {
         //     console.log("Error en ProductsDAO - getProducts => ", err)
@@ -46,9 +48,22 @@ class ProductsDAO {
         // }
     }
 
-    async addProduct(product) {
+    async addProduct(product, email) {
+        
         try {
-            const productToAdd = await ProductModel.create(product)
+            
+            const newProduct = {
+                title: product.title,
+                description: product.description,
+                price: product.price,
+                thumbnail: product.thumbnail,
+                code: product.code,
+                stock: product.stock,
+                status: product.status,
+                category: product.category,
+                owner: email
+            }
+            const productToAdd = await ProductModel.create(newProduct)
             return productToAdd.toObject()
         }
         catch (err) {

@@ -35,7 +35,7 @@ module.exports = ()  => {
         })
     })
     
-    router.post("/", userIsLoggedIn, userShouldBeAdmin, (req, res) => {
+    router.post("/", userIsLoggedIn,/*  userShouldBeAdmin, */ (req, res) => {
         controller.addProduct(req, res)
     })
 

@@ -11,7 +11,8 @@ class ProductsDTO {
         this.code = product.code,
         this.stock = product.stock,
         this.status = product.status,
-        this.category = product.category
+        this.category = product.category,
+        this.owner = product.owner
     }
 
     transform() {
@@ -23,6 +24,7 @@ class ProductsDTO {
             thumbnail: this.thumbnail,
             stock: this.stock,
             category: this.category,
+            owner: this.owner
         }
     }
 

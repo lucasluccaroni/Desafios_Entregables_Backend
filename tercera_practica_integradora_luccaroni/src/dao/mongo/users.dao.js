@@ -47,6 +47,17 @@ class UsersDAO {
             return null
         }
     }
+
+    async changeRole(id, userRole) {
+        try {
+            const result = await UserModel.findByIdAndUpdate({ _id: id }, { $set: { role: userRole } })
+
+        }
+        catch (err) {
+            logger.error(`Error en ProductsDAO - changeRole => ${err}`)
+            return null
+        }
+    }
 }
 
 module.exports = { UsersDAO }
