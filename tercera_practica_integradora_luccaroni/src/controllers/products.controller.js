@@ -84,13 +84,15 @@ class ProductsController {
 
     async deleteProduct(req, res) {
         try {
+            const userEmail = req.session.user.email
+            console.log("USER EMAIL DELETE => ", userEmail)
             const id = req.params.pid
-            const deletedProduct = await this.service.deleteProduct(id)
+            const deletedProduct = await this.service.deleteProduct(id, userEmail)
 
             res.sendSuccess(`Product succesfully deleted`)
         }
         catch (err) {
-            req.logger.fatal("CATCH EN CONTROLLER - deleteProduct => ", err)
+            // req.logger.error("CATCH EN CONTROLLER - deleteProduct => ", err)
             res.status(err.code).send(err)
         }
     }

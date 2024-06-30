@@ -13,6 +13,16 @@ module.exports = {
     generateInvalidProductDataError(){
         return ` Some product data sent is incorrect or missing. Please check it before re-sending.` 
     },
+    
+    generateWrongOwnerError() {
+        return `This product does not belong to you and you're not admin!`
+
+    },
+
+    generateSameOwnerError(){
+        return `This product belongs to you! You can't add your own products to your cart.`
+
+    },
 
     // CARTS
     generateInvalidCartIdError(id){

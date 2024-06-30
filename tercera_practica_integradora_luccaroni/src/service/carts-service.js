@@ -130,7 +130,7 @@ class CartsService {
         const userCart = user.cart.toString()
         logger.debug("USER CART => ", userCart)
 
-        // Comparo los carritos. El usuario registrado solo puede añadir carritos al carrito que le corresponde.
+        // Comparo los carritos. El usuario registrado solo puede añadir productos al carrito que le corresponde.
         if (userCart !== cart.id) {
             throw CustomError.createError({
                 name: "This Cart in not yours!",
@@ -159,6 +159,22 @@ class CartsService {
         }
         logger.debug("PRODUCTO ENCONTRADO => ", productToAdd)
 
+        console.log("PRODUCT OWNER => ", productToAdd.owner)
+        console.log("USER => ", user.email)
+        // Me fijo si el producto tiene como Owner al usuario que lo quiere agregar a su carrito. Si son la misma persona, mando error, no se puede. EXCEPTO EL ADMIN.
+        if (productToAdd.owner === user.email) {
+            if (user.email === "admin@admin.com") {
+                console.log("pase nomas, señor admin")
+            } else {
+                throw CustomError.createError({
+                    name: "This Product belongs to you!",
+                    cause: "Wrong Owner",
+                    message: errors.generateSameOwnerError(),
+                    code: ErrorCodes.UNAUTHORIZED
+                })
+            }
+        }
+
         // Busco si el producto ya existe en el carrito
         let found = cart.products.find(productToAdd => {
             return (productToAdd._id.toString() === productId)
@@ -185,7 +201,7 @@ class CartsService {
 
             // Si existe, sumo la cantidad ingresada + la que que tenia y actualizo el producto    
         } else if (found) {
-           logger.info("FOUND ENCONTRADO => ", found)
+            logger.info("FOUND ENCONTRADO => ", found)
 
             // Verifico la cantidad actual, la que se quiere actualizar y el stock disponible
             if (found.quantity < 0 || quantity < 0 || quantity > productToAdd.stock) {
@@ -323,7 +339,7 @@ class CartsService {
         }
 
         const result = await this.dao.clearCart(id)
-       logger.info("RESULT SERVICE => ", result)
+        logger.info("RESULT SERVICE => ", result)
         if (!result) {
             throw CustomError.createError({
                 name: "Database Error",
@@ -349,7 +365,7 @@ class CartsService {
             })
 
         } else if (deletedCart.deletedCount == 0) {
-           logger.debug("DELETED CART SERVICE", deletedCart.deletedCount)
+            logger.debug("DELETED CART SERVICE", deletedCart.deletedCount)
             throw CustomError.createError({
                 name: "Not Found",
                 cause: "Cart not found in Database.",

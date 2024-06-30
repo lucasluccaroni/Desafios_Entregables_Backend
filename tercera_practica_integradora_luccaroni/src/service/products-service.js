@@ -3,7 +3,7 @@ const { ProductsDTO } = require("../dao/dtos/products.dto")
 const ProductModel = require("../dao/models/product.model")
 const { CustomError } = require("./errors/CustomError")
 const { ErrorCodes } = require("./errors/errorCodes")
-const { generateInvalidProductIdError, generateInvalidProductDataError } = require("./errors/errors")
+const { generateInvalidProductIdError, generateInvalidProductDataError, generateWrongOwnerError } = require("./errors/errors")
 const errors = require("./errors/errors")
 const { logger } = require("../logger/logger")
 
@@ -150,8 +150,26 @@ class ProductsService {
         return updatedProduct
     }
 
-    async deleteProduct(id) {
+    async deleteProduct(id, userEmail) {
 
+        const product = await this.getProductById(id)
+        const productOwner = product.owner
+        console.log("SERVICE - PRODUCT TO DELETE => ", productOwner)
+
+        // Me fijo si el producto tiene como Owner al usuario que lo quiere eliminar. Solo puede eliminarlo la persona que lo creó Y EL ADMIN.
+        if(userEmail !== product.owner) {
+            if(userEmail === "admin@admin.com"){
+                console.log("pase nomas, señor admin")
+            } else {
+                throw CustomError.createError({
+                    name: "This Product is not yours!",
+                    cause: "Wrong Owner",
+                    message: generateWrongOwnerError(),
+                    code: ErrorCodes.UNAUTHORIZED
+                })
+            
+            }
+        }
         const deletedProduct = await this.dao.deleteProduct(id)
 
         if (!deletedProduct) {
