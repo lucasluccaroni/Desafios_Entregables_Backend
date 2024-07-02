@@ -38,14 +38,31 @@ module.exports = () => {
         })
     })
 
-    // RESET PASSWORD
-    router.get("/reset_password", userIsNotLoggedIn, (_, res) => {
+    //// RESET PASSWORD (viejo)
+    //// router.get("/reset_password", userIsNotLoggedIn, (_, res) => {
 
-        res.render("reset_password", {
-            title: "Reset Passowrd"
+    ////     res.render("reset_password", {
+    ////         title: "Reset Passowrd"
+    ////     })
+    //// })
+
+    // RESET PASSWORD 1 (nuevo, con jwt) - Se envia un mail para restablecer la contraseña
+    router.get("/forgot-password", (_, res) => {
+        res.render("forgot-password", {
+            title: "SEND EMAIL - NEW RESET"
         })
     })
 
+    // RESET PASSWORD 2 (nuevo, con jwt) - El mail contiene un link para restablecer la contraseña. Esta es la view de ese link
+    router.get("/new-reset-password", (req, res) => {
+        const { token } = req.query
+
+        console.log("TOKEN QUE LLEGA DEL MAIL => ", token)
+        res.render("new-reset-password", {
+            title: "GET EMAIL - NEW RESET",
+            token: token
+        })
+    })
 
     // PROFILE
     router.get("/profile", userIsLoggedIn, async (req, res) => {

@@ -14,12 +14,24 @@ module.exports = () => {
 
     const router = Router()
 
+    // Usuario premium
     router.get("/premium/:uid", userIsLoggedIn, async (req, res) => {
 
         await controller.changeRole(req, res)
 
+    })
 
-        // res.send({ message: `Welcome, ${userId}!` })
+
+    // Reset Password 1 (nuevo, con jwt) - Se envia un mail para restablecer la contraseña
+    router.get("/newResetPassword", async (req, res) => {
+        await controller.sendEmailToResetPassword(req, res)
+    })
+
+
+    // Reset Password 2 (nuevo, con jwt) - El mail contiene un link para restablecer la contraseña. El link es un form "post" que manda los datos hacia aca
+    router.post("/reset-password", async (req, res) => {
+        await controller.newResetPassword(req, res)
+
     })
 
     return router

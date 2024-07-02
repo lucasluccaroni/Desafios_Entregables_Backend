@@ -75,12 +75,22 @@ module.exports = () => {
         })
     })
 
-    // RESET PASSWORD
+    // RESET PASSWORD (viejo)
     router.post("/reset_password", async (req, res) => {
         const resetPassword = await controller.resetPassword(req, res)
         req.logger.info(resetPassword)
 
         res.redirect("/")
+    })
+
+    // RESET PASSWORD (nuevo con JWT)
+    router.post("/forgot-password", async (req, res) => {
+        const newResetPassword = await controller.newResetPassword(req, res)
+        console.log(newResetPassword)
+
+        res.render("forgot-password", {
+
+        })
     })
     return router
 }

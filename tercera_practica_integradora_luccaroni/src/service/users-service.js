@@ -5,70 +5,119 @@ const { ErrorCodes } = require("./errors/errorCodes")
 const { CustomError } = require("./errors/CustomError")
 const errors = require("./errors/errors")
 const { logger } = require("../logger/logger")
-const { id_ID } = require("@faker-js/faker")
+
+const jwt = require("jsonwebtoken")
+const { privateKey } = require("../config")
+const bcrypt = require("bcrypt")
 
 class UsersService {
     constructor(dao) {
         this.dao = dao
     }
 
-    async resetPassword(email, password) {
+    //// async resetPassword(email, password) {
 
-        // Verifico que se haya ingresado email y password
-        if (!email || !password) {
-            throw CustomError.createError({
-                name: "Invalid Credentials",
-                cause: "Missing or Wrong credentials.",
-                message: errors.generateInvalidCredentialsError(email, password),
-                code: ErrorCodes.INVALID_TYPES_ERROR
-            })
-        }
+    ////     // Verifico que se haya ingresado email y password
+    ////     if (!email || !password) {
+    ////         throw CustomError.createError({
+    ////             name: "Invalid Credentials",
+    ////             cause: "Missing or Wrong credentials.",
+    ////             message: errors.generateInvalidCredentialsError(email, password),
+    ////             code: ErrorCodes.INVALID_TYPES_ERROR
+    ////         })
+    ////     }
 
-        // Busco al usuario
-        const user = await this.dao.getUserByEmail(email)
-        if (!user) {
-            throw CustomError.createError({
-                name: "Not Found ",
-                cause: "User Not Found in Database",
-                message: errors.generateInvalidUserEmailError(email),
-                code: ErrorCodes.INVALID_TYPES_ERROR
-            })
-        }
+    ////     // Busco al usuario
+    ////     const user = await this.dao.getUserByEmail(email)
+    ////     if (!user) {
+    ////         throw CustomError.createError({
+    ////             name: "Not Found ",
+    ////             cause: "User Not Found in Database",
+    ////             message: errors.generateInvalidUserEmailError(email),
+    ////             code: ErrorCodes.INVALID_TYPES_ERROR
+    ////         })
+    ////     }
 
-        // Hasheo la contraseña
-        const hashedPassword = hashPassword(password)
-        // Actuializo la nueva contraseña
-        const resetPassword = await this.dao.resetUserPassword(email, hashedPassword)
+    //     // Hasheo la contraseña
+    ////     const hashedPassword = hashPassword(password)
+    //     // Actuializo la nueva contraseña
+    ////     const resetPassword = await this.dao.resetUserPassword(email, hashedPassword)
 
-        // Mando mail de confirmacion
+    ////     return resetPassword
+    //// }
+
+
+    async sendResetEmail(email) {
+
+        const token = jwt.sign({ email }, privateKey, { expiresIn: "1h" })
+        console.log("TOKEN CREADO EN sendResetEmail => ", token)
+
+        const resetLink = `http://localhost:8080/new-reset-password?token=${token}`
+
+        return await transport.sendMail({
+            from: "LucasLucc",
+            to: `${email}`,
+            subject: "Password recovery service.",
+            html: `
+                <div>
+                    <h2> Genere una nueva conraseña </h2>
+                    <p> Haga clic en el siguiente enlace para restablecer su contraseña. </p> 
+                    <a href=${resetLink} > Click aqui </a>
+                </div>
+                `
+        })
+    }
+
+
+    async newResetPassword(token, password) {
         try {
-            await transport.sendMail({
-                from: "LucasLucc",
-                to: `${email}`,
-                subject: "Restablecimiento de contraseña",
-                html: `
-                    <div>
-                        <h2> Genere una nueva conraseña </h2>
-                        <a href="https://google.com">Click aqui</a>
-        
-                    </div>
-                    `
-            })
+            // Verifico el token
+            const tokenInfo = jwt.verify(token, privateKey)
+            console.log("TOKEN VERIFICATION => ", tokenInfo )
 
-            logger.debug("MAIL ENVIADO!")
+            // Busco al usuario
+            const user = await this.dao.getUserByEmail(tokenInfo.email)
+            if (!user) {
+                throw CustomError.createError({
+                    name: "Not Found ",
+                    cause: "User Not Found in Database",
+                    message: errors.generateInvalidUserEmailError(),
+                    code: ErrorCodes.INVALID_TYPES_ERROR
+                })
+            }
+
+            // Verifico que la nueva contraseña no sea la misma que la previa
+            const samePassword = await bcrypt.compare(password, user.password)
+            if (samePassword) {
+                throw CustomError.createError({
+                    name: "Same password ",
+                    cause: "Old password and same password are equals.",
+                    message: errors.generateSamePasswordError(),
+                    code: ErrorCodes.UNAUTHORIZED
+                })
+            }
+
+            // Si esta todo bien, hasheo la nueva contraseña
+            const hashedPassword = hashPassword(password)
+            // Actuializo la nueva contraseña
+            const resetPassword = await this.dao.resetUserPassword(tokenInfo.email, hashedPassword)
+
+            return resetPassword
         }
         catch (err) {
-            logger.error("Error enviando mail para restablecer contraseña! => ", err)
+            logger.error(`ERROR EN USERS SERVICE => ${err.message}`)
+            console.log(err)
+            return null
         }
-
-        return resetPassword
     }
+
 
     async getUserById(id) {
         const user = this.dao.getUserById(id)
         return user
     }
 
+    
     async changeRole(id) {
 
         // Busco al usuario

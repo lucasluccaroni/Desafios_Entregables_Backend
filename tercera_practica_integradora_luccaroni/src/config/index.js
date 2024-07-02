@@ -12,5 +12,7 @@ module.exports = {
     callbackURL: process.env.CALLBACK_URL_GITHUB,
     enviroment: process.env.NODE_ENV,
     userGmail: process.env.GMAIL_ACCOUNT,
-    passGmail: process.env.GMAIL_PASS
+    passGmail: process.env.GMAIL_PASS,
+    privateKey: process.env.PRIVATE_KEY
+
 }

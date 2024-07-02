@@ -52,5 +52,9 @@ module.exports = {
 
     generateInvalidUserIdError(id){
         return ` Invalid user data. ID: Should be an MongoObjectId. Recived: ${id} (${typeof id})`
+    },
+    
+    generateSamePasswordError() {
+        return "You can't set the same password as new password! Try another one."
     }
 }
