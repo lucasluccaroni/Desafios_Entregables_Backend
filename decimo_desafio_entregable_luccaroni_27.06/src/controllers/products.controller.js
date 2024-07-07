@@ -39,7 +39,7 @@ class ProductsController {
         try {
             const id = req.params.pid
             const product = await this.service.getProductById(id)
-
+            console.log("REULTADO DE PRODUCT BY ID EN CONTROLLER => ", product)
             return product
         }
         catch (err) {
