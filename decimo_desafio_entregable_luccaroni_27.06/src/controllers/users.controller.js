@@ -33,7 +33,7 @@ class UsersController {
                 res.send(user)
 
             } else {
-                const user = await this.service.getUseById(idFromSession)
+                const user = await this.service.getUserById(idFromSession)
                 res.send(user)
             }
         }

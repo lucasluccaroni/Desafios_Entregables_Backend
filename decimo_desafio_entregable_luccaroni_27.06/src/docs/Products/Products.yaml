@@ -80,7 +80,7 @@ paths:
                   payload:
                     $ref: "#components/schemas/Product"
         "400":
-          description: Informacion invalida, error en los campos del producto
+          description: Informacion invalida, error en los campos del body
           content:
             application/json:
               schema:
@@ -112,7 +112,7 @@ paths:
                     type: string
                     example: "An unexpected error caused failure in opreation. Please try again later and verify your inputs."
         "401":
-          description: No autorizado. Necesita una sesión activa y la misma debe ser admin o premium.
+          description: No autorizado. Se necesita una sesión activa.
           content:
             application/json:
               schema:
@@ -120,7 +120,17 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "User should be logged in! / User should be admin or premium!"
+                    example: "User should be logged in!"
+        "403":
+          description: El usuario debe ser admin o premium para crear un producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User should be admin or premium!
   /api/products/{pid}:
     get:
       summary: Devuelve un producto por su ID.
@@ -173,9 +183,19 @@ paths:
       responses:
         "200":
           description: Operacion exitosa
-          # Completar la response 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: string
+                    example: "Product updated successfully"
         "401":
-          description: No autorizado. Necesita una session activa y el usuario debe ser admin o premium.
+          description: No autorizado. Se necesita una session activa
           content:
             application/json:
               schema:
@@ -183,7 +203,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "User should be logged in! / User should be admin or premium!" 
+                    example: "User should be logged in!" 
         "400":
           description: Informacion invalida, error en los campos del producto
           content:
@@ -200,6 +220,16 @@ paths:
                   message:
                     type: string
                     example: "Some product data sent is incorrect or misisng. Please check it before re-sending."
+        "403":
+          description: El usuario debe ser admin o premium para crear un producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User should be admin or premium!
         "404":
           description: No se encontró el producto en la base de datos.
           content:
@@ -317,7 +347,6 @@ paths:
                     example: "An unexpected error caused failure in opreation. Please try again later and verify your inputs."
 
 
-# Usar codigo response 403 para errores de owner premium/admin
 components:
   schemas:
     Product:

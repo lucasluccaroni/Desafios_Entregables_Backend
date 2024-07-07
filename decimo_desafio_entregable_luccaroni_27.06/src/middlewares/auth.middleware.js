@@ -123,7 +123,7 @@ module.exports = {
                 logger.info("USER EN SWITCH => ", user )
 
                 if (user.role !== "premium") {
-                    return res.status(401).json({ error: "User should be admin or premium!" })
+                    return res.status(403).json({ error: "User should be admin or premium!" })
                 } else {
                     break;
                 }

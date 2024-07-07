@@ -1,0 +1,56 @@
+paths:
+  /api/sessions/current:
+    get:
+      summary: Obtiene la informacion del usuario que mantiene la sesion activa.
+      tags:
+        - Sessions
+      responses:
+        "200":
+          descripcion: Operacion existosa 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    $ref: "#components/schemas/User"
+
+
+
+components:
+  schemas:
+    User:
+      properties:
+        _id:
+          type: string
+          description: ID generado por mongo
+        firstName:
+          type: string
+          description: nombre del usuario
+        lastName:
+          type: string
+          description: apellido del usuario
+        age:
+          type: number
+          description: edad del usuario
+        password:
+          type: string
+          description: contraseña cifrada del usuario
+        email:
+          type: string
+          description: email del usuario
+        cart:
+          type: string
+          description: ID del carrito que se le genera al usuario al ser creado. Dentro de este se agregarn los productos que él agrege al carrito.
+        role:
+          type: string
+          description: Rol del usuario denro de la aplicacion. Por defecto es 'user'
+      example:
+        _id: 668b191d96683107cbd0b181
+        firstName: "TestName"
+        lastName: "TestName"
+        age: 99
+        password: "$2b$10$Qq.4KgtRlq6d.0PrfHBtXO3//NbK2VTsQEdzVjBnExktCrnA1NGzq"
+        email: test@gmail.com
+        cart: 668b191d96683107cbd0b195
+        role: user
