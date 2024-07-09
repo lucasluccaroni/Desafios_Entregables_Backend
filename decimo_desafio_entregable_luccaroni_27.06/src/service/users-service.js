@@ -91,7 +91,7 @@ class UsersService {
             if (samePassword) {
                 throw CustomError.createError({
                     name: "Same password ",
-                    cause: "Old password and same password are equals.",
+                    cause: "Old password and new password are equals.",
                     message: errors.generateSamePasswordError(),
                     code: ErrorCodes.UNAUTHORIZED
                 })

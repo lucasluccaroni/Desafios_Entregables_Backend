@@ -32,7 +32,7 @@ module.exports = () => {
         controller.createCart(req, res)
     })
 
-    router.post("/:cid/product/:pid", userIsLoggedIn, userShouldNotBeAdmin, (req, res) => {
+    router.post("/:cid/products/:pid", userIsLoggedIn, userShouldNotBeAdmin, (req, res) => {
         controller.addProductToExistingCart(req, res)
     })
 
@@ -40,7 +40,7 @@ module.exports = () => {
         controller.updateProductFromExistingCart(req, res)
     })
 
-    router.delete("/:cid/product/:pid", userIsLoggedIn, (req, res) => {
+    router.delete("/:cid/products/:pid", userIsLoggedIn, (req, res) => {
         controller.deleteProductFromExistingCart(req, res)
     })
 

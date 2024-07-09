@@ -88,9 +88,9 @@ module.exports = () => {
         const newResetPassword = await controller.newResetPassword(req, res)
         console.log(newResetPassword)
 
-        res.render("forgot-password", {
+        // res.render("forgot-password", {
 
-        })
+        // })
     })
     return router
 }

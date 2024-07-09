@@ -64,7 +64,6 @@ class CartsService {
         // console.log("RESPUESTA getCartById DAO => ", cart)
 
         if (cart === false) {
-            // throw new Error("Cart not found!")
             throw CustomError.createError({
                 name: "Not Found false",
                 cause: "Cart not found in Database.",
@@ -77,7 +76,7 @@ class CartsService {
                 name: "Invalid Data",
                 cause: "Cart not found in Database.",
                 message: errors.generateInvalidProductIdError({ id }),
-                code: ErrorCodes.INVALID_TYPES_ERROR
+                code: ErrorCodes.DATABASE_ERROR
             })
         }
 
@@ -238,7 +237,7 @@ class CartsService {
         const userCart = user.cart.toString()
         logger.http("USER CART => ", userCart)
 
-        // Comparo los carritos. El usuario registrado solo puede añadir carritos al carrito que le corresponde.
+        // Comparo los carritos. El usuario registrado solo puede editar productos en el carrito que le corresponde.
         if (userCart !== cart.id) {
             throw CustomError.createError({
                 name: "This Cart in not yours!",
