@@ -4,7 +4,7 @@
   "description": "proyecto de backend en coderhouse",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test --recursive",
     "start": "nodemon --env-file=.env --watch-path=src src/app.js"
   },
   "author": "lucas luccaroni",
