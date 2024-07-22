@@ -59,23 +59,28 @@ class UsersDAO {
         }
     }
 
-    async uploadDocuments(userId, originalname, path) {
-        try{
-            const documents =
+    async uploadDocuments(userId, destination, path) {
+        try {
+            const newDocument =
             {
-                docName: originalname,
+                docName: destination,
                 docReference: path
             }
-            const uploadDocuments = await UserModel.updateOne({ _id: userId }, { $set: documents })
+            const uploadDocuments = await UserModel.findOneAndUpdate(
+                { _id: userId },
+                { $push: { documents: newDocument } },
+                { new: true }
+            )
+
             console.log(uploadDocuments)
 
             return uploadDocuments
         }
-        catch(err) {
+        catch (err) {
             logger.error("Error en UsersDAO - uploadDocuments => ", err)
             return null
         }
-        
+
     }
 }
 

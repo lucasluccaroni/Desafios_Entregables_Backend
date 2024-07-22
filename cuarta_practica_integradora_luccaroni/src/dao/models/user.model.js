@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 const schema = new mongoose.Schema({
-    
+
     firstName: {
         type: String,
         required: true
@@ -29,6 +29,12 @@ const schema = new mongoose.Schema({
         type: String,
         default: "user"
     },
+    documents: [
+        {
+            docName: { type: String },
+            docReference: { type: String}
+        }
+    ],
     last_connection: {
         type: Date
     }

@@ -165,11 +165,11 @@ class UsersService {
         }
 
         // Extraigo el nombre y el path del documento, que seran cargados al User en la DB
-        const { originalname, path } = file
-        console.log(originalname, path)
+        const { destination, path } = file
+        console.log(destination, path)
 
         // Le cargo la imagen al user en la DB
-        const uploadDocuments = this.dao.uploadDocuments(userId, originalname, path)
+        const uploadDocuments = this.dao.uploadDocuments(userId, destination, path)
 
         return uploadDocuments
     }

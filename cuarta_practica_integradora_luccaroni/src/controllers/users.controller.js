@@ -113,7 +113,7 @@ class UsersController {
             const userId = req.session.user.id
             const uploadDocuments = await this.service.uploadDocuments(file, userId)
 
-            res.sendSuccess(uploadDocuments)
+            res.sendSuccess("Image has been succesfully uploaded!")
         }
         catch(err){
             req.logger.fatal("CATCH EN CONTROLLER - uploadDocuments", err)
