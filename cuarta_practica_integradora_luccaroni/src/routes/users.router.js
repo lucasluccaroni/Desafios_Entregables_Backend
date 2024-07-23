@@ -10,7 +10,7 @@ const service = new UsersService(dao)
 const { UsersController } = require("../controllers/users.controller")
 const controller = new UsersController(service)
 
-const uploader = require("../middlewares/uploadFile")
+const {uploaderProducts, uploaderDocuments } = require("../middlewares/uploadFiles")
 
 module.exports = () => {
 
@@ -38,7 +38,7 @@ module.exports = () => {
 
 
     // Carga de documentos
-    router.post("/:uid/documents", uploader.single("image"), async (req, res) => {
+    router.post("/:uid/documents", uploaderDocuments.array("documents", 3), async (req, res) => {
 
         await controller.uploadDocuments(req, res)
     })

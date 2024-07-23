@@ -2,7 +2,6 @@ const { ErrorCodes } = require("../service/errors/errorCodes")
 const { CustomError } = require("../service/errors/CustomError")
 const errors = require("../service/errors/errors")
 const { logger } = require("../logger/logger")
-// const uploader = require("../middlewares/uploadFile")
 
 class UsersController {
     constructor(service) {
@@ -23,6 +22,7 @@ class UsersController {
     ////     }
     //// }
 
+    // Traer usuario por ID
     async getUserById(req, res) {
         try {
             const idFromSession = req.session.user.id
@@ -43,6 +43,7 @@ class UsersController {
         }
     }
 
+    // Cambiar rol de user -> premium (y visceversa)
     async changeRole(req, res) {
         try {
             const userId = req.params.uid
@@ -99,23 +100,36 @@ class UsersController {
             req.logger.fatal("CATCH EN CONTROLLER - newResetPassword", err)
             req.logger.error(err.code)
             res.sendError(err.message)
-
         }
     }
 
-
+    // Carga de documentos para los users + guardarlos en la DB
     async uploadDocuments(req, res) {
         try{
             console.log(`ARCHIVO EN ${req.path}`)
-            console.log(req.file)
+            console.log(req.files)
     
-            const file = req.file
+            const files = req.files
             const userId = req.session.user.id
-            const uploadDocuments = await this.service.uploadDocuments(file, userId)
+            const uploadDocuments = await this.service.uploadDocuments(files, userId)
 
             res.sendSuccess("Image has been succesfully uploaded!")
         }
         catch(err){
+            req.logger.fatal("CATCH EN CONTROLLER - uploadDocuments", err)
+            req.logger.error(err.code)
+            res.sendError(err.message)
+        }
+    }
+    
+    // Actualizar la fecha de última conexion en la DB
+    async updateLastConnection(req, res) {
+        const userId = req.user.id
+        try{
+            const updateLastConnection =  await this.service.updateLastConnection(userId)
+            console.log(updateLastConnection)
+        }
+        catch(err) {
             req.logger.fatal("CATCH EN CONTROLLER - uploadDocuments", err)
             req.logger.error(err.code)
             res.sendError(err.message)

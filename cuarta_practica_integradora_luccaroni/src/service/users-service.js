@@ -151,7 +151,7 @@ class UsersService {
     }
 
 
-    async uploadDocuments(file, userId) {
+    async uploadDocuments(files, userId) {
 
         // Busco al user por su id
         const user = await this.dao.getUserById(userId)
@@ -164,14 +164,41 @@ class UsersService {
             })
         }
 
-        // Extraigo el nombre y el path del documento, que seran cargados al User en la DB
-        const { destination, path } = file
-        console.log(destination, path)
+        // Extraigo el nombre y el path de el/los documento/s, que seran cargados al User en la DB
+        
+        const processedFiles = files.map((img) => {
+            const { originalname, path} = img
+            return {docName: originalname , docReference: path}
+        })
+        console.log(processedFiles)
 
         // Le cargo la imagen al user en la DB
-        const uploadDocuments = this.dao.uploadDocuments(userId, destination, path)
+        const uploadDocuments = this.dao.uploadDocuments(userId, processedFiles)
 
         return uploadDocuments
+    }
+
+    async updateLastConnection(userId) {
+        
+        // Busco al user por su id
+        const user = await this.dao.getUserById(userId)
+        if (!user) {
+            throw CustomError.createError({
+                name: "Not Found ",
+                cause: "User Not Found in Database",
+                message: errors.generateInvalidUserIdError(id),
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
+        }
+
+        // Establezco la hora actual
+        const fechaUTC = new Date()
+        const desplazamientoHorario = -3 * 60 * 60 * 1000
+        const fechaHoraArg = new Date(fechaUTC.getTime() + desplazamientoHorario)
+
+        // Mando la hora y el user para al DAO para realizar la escritura en la DB
+        const lastConnection = await this.dao.updateLastConnection(userId, fechaHoraArg)
+        return lastConnection
     }
 }
 

@@ -100,14 +100,26 @@ module.exports = () => {
         }
     })
 
-    // VISTA DE CARGA DE ARCHIVOS PARA EL USER  
-    router.get("/upload-documents", /* userIsLoggedIn, userShouldBeAdminOrPremium , */(req, res) => {
+    // Vista de Carga de documentos para el USER
+    router.get("/upload-documents", /* userIsLoggedIn,*/(req, res) => {
 
         const uid = req.session.user.id
         console.log("Informacion de sesion carga imagen =>", uid)
 
         res.render("uploadDocuments", {
             title: "Upload Documents",
+            uid
+        })
+    })
+
+    // Vista de Carga de imagenes de productos para el User
+    router.get("/upload-product-images", /* userIsLoggedIn, userShouldBeAdminOrPremium , */(req, res) => {
+
+        const uid = req.session.user.id
+        console.log("Informacion de sesion carga imagen =>", uid)
+
+        res.render("uploadProductImages", {
+            title: "Upload Product Images",
             uid
         })
     })

@@ -59,16 +59,12 @@ class UsersDAO {
         }
     }
 
-    async uploadDocuments(userId, destination, path) {
+    async uploadDocuments(userId, processedFiles) {
         try {
-            const newDocument =
-            {
-                docName: destination,
-                docReference: path
-            }
+
             const uploadDocuments = await UserModel.findOneAndUpdate(
                 { _id: userId },
-                { $push: { documents: newDocument } },
+                { $push: { documents: processedFiles } },
                 { new: true }
             )
 
@@ -80,7 +76,21 @@ class UsersDAO {
             logger.error("Error en UsersDAO - uploadDocuments => ", err)
             return null
         }
+    }
 
+    // Actualizar la ultima conexion del user
+    async updateLastConnection(userId, fechaHoraArg) {
+        try {
+            const lastConnection = await UserModel.findOneAndUpdate(
+                { _id: userId },
+                { $push: { last_connection: fechaHoraArg } }
+            )
+            return lastConnection
+        }
+        catch (err) {
+            logger.error("Error en UsersDAO - updateLastConnection => ", err)
+            return null
+        }
     }
 }
 

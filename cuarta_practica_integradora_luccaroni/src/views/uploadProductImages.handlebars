@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Product Images</title>
+</head>
+
+<body>
+    <h1> Product Images uploader </h1>
+
+    <form method="post" action="/users/{{uid}}/products" enctype="multipart/form-data">
+
+
+        <h2> Upload your images here:</h2>
+        <label for="_image"> Image </label>
+        <input type="file" name="image" id="_image" multiple>
+
+        <input type="submit" value="Upload">
+
+    </form>
+
+</body>
+
+</html>
