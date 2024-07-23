@@ -93,6 +93,25 @@ class ProductsDAO {
             return null
         }
     }
+
+    async uploadImages(productId, processedFiles) {
+        try {
+
+            const uploadImages = await ProductModel.findOneAndUpdate(
+                { _id: productId },
+                { $push: { thumbnail: processedFiles } },
+                { new: true }
+            )
+
+            console.log(uploadImages)
+
+            return uploadImages
+        }
+        catch (err) {
+            logger.error("Error en UsersDAO - uploadImages => ", err)
+            return null
+        }
+    }
 }
 
 module.exports = { ProductsDAO }

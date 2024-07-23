@@ -130,6 +130,16 @@ class UsersService {
                 code: ErrorCodes.INVALID_TYPES_ERROR
             })
         }
+        console.log("CANTIDAD DE DOCUMENTOS DEL USER => ", user.documents.length)
+        // Me fijo si tiene suficientes documentos cargados (3) para pasar a usuario premium 
+        if (user.documents.length < 3) {
+            throw CustomError.createError({
+                name: "Unauthorized to change roles.",
+                cause: "Insufficient documents in your acount",
+                message: errors.generateInsufficientDocumentsError(),
+                code: ErrorCodes.UNAUTHORIZED
+            })
+        }
 
         console.log(user)
         // Me fijo que rol tiene
@@ -165,12 +175,27 @@ class UsersService {
         }
 
         // Extraigo el nombre y el path de el/los documento/s, que seran cargados al User en la DB
-        
         const processedFiles = files.map((img) => {
-            const { originalname, path} = img
-            return {docName: originalname , docReference: path}
+            const { originalname, path } = img
+            return { docName: originalname, docReference: path }
         })
         console.log(processedFiles)
+
+
+        // Valido que los archivos contengan alguna de las palabras claves: "adress", "status" o "identification"
+        const docNameValidation = processedFiles.every(document => {
+            const allowedWords = ["status", "adress", "identification"]
+            return allowedWords.some(word => document.docName.includes(word))
+        })
+        console.log("DOCUMENT VALIDATION => ", docNameValidation)
+        if (!docNameValidation) {
+            throw CustomError.createError({
+                name: "Wrong file names.",
+                cause: "Wrong file names.",
+                message: errors.generateWrongFileNamesError(),
+                code: ErrorCodes.UNAUTHORIZED
+            })
+        }
 
         // Le cargo la imagen al user en la DB
         const uploadDocuments = this.dao.uploadDocuments(userId, processedFiles)
@@ -179,7 +204,7 @@ class UsersService {
     }
 
     async updateLastConnection(userId) {
-        
+
         // Busco al user por su id
         const user = await this.dao.getUserById(userId)
         if (!user) {

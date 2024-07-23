@@ -61,7 +61,6 @@ class ProductsService {
         // console.log("RESPUESTA PRODUCT DAO => ", product)
 
         if (product === false) {
-            // throw new Error("Product not found!")
             throw CustomError.createError({
                 name: "Not Found false",
                 cause: "Product not found in Database.",
@@ -87,7 +86,7 @@ class ProductsService {
 
     async addProduct(productData, userEmail) {
 
-        const { title, description, code, price, status, stock, category, thumbnail } = productData
+        const { title, description, code, price, status, stock, category} = productData
 
         if (!title || !code || price < 0 || !price || stock < 0 || !category || !description || !status) {
             throw CustomError.createError({
@@ -192,6 +191,32 @@ class ProductsService {
 
         logger.debug("DELETED PRODUCT SERVICE", deletedProduct.deletedCount)
         return (deletedProduct)
+    }
+
+    async uploadImages(files, productId) {
+
+        // Busco al product por su id
+        const product = await this.dao.getProductById(productId)
+        if (!product) {
+            throw CustomError.createError({
+                name: "Not Found",
+                cause: "Product not found in Database.",
+                message: errors.generateInvalidProductIdError({ id }),
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+
+        // Extraigo el nombre y el path de el/los documento/s, que seran cargados al User en la DB
+        const processedFiles = files.map((img) => {
+            const { originalname, path } = img
+            return { docName: originalname, docReference: path }
+        })
+        console.log(processedFiles)
+
+        // Le cargo la imagen al user en la DB
+        const uploadImages = this.dao.uploadImages(productId, processedFiles)
+
+        return uploadImages
     }
 }
 

@@ -5,7 +5,9 @@ const productStorage = multer.diskStorage({
         cb(null, `${__dirname}/../../files/products`)
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname)
+        const pid = req.params.pid
+        const fileName = `${file.originalname}-${pid}`
+        cb(null, fileName)
     }
 })
 const uploaderProducts = multer({ storage: productStorage })
@@ -22,7 +24,7 @@ const documentStorage = multer.diskStorage({
         cb(null, fileName)
     }
 })
-const uploaderDocuments = multer({ storage: documentStorage })
 
+const uploaderDocuments = multer({ storage: documentStorage })
 
 module.exports = { uploaderProducts, uploaderDocuments }

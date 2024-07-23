@@ -98,6 +98,25 @@ class ProductsController {
             res.status(err.code).send(err)
         }
     }
+
+    // Carga de imagenes para los products + guardarlos en la DB
+    async uploadImages(req, res) {
+        try{
+            console.log(`ARCHIVO EN ${req.path}`)
+            console.log(req.files)
+    
+            const files = req.files
+            const productId = req.params.pid
+            const uploadImages = await this.service.uploadImages(files, productId)
+
+            res.sendSuccess("Image has been succesfully uploaded!")
+        }
+        catch(err){
+            req.logger.fatal("CATCH EN CONTROLLER - uploadImages", err)
+            req.logger.error(err.code)
+            res.sendError(err.message)
+        }
+    }
 }
 
 module.exports = { ProductsController }

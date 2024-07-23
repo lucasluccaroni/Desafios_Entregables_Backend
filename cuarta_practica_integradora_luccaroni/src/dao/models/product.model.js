@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const mongoosePaginate = require("mongoose-paginate-v2")
 
 const schema = new mongoose.Schema({
-    
+
     title: {
         type: String,
         required: true
@@ -15,9 +15,12 @@ const schema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    thumbnail: {
-        type: String
-    },
+    thumbnail: [
+        {
+            docName: { type: String },
+            docReference: { type: String }
+        }
+    ],
     code: {
         type: String,
         required: true,

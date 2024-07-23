@@ -10,7 +10,7 @@ const service = new UsersService(dao)
 const { UsersController } = require("../controllers/users.controller")
 const controller = new UsersController(service)
 
-const {uploaderProducts, uploaderDocuments } = require("../middlewares/uploadFiles")
+const {uploaderDocuments } = require("../middlewares/uploadFiles")
 
 module.exports = () => {
 
