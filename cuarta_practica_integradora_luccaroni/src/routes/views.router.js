@@ -1,5 +1,5 @@
 const { Router } = require("express")
-const { userIsLoggedIn, userIsNotLoggedIn, userShouldBeAdminOrPremium} = require("../middlewares/auth.middleware")
+const { userIsLoggedIn, userIsNotLoggedIn, userShouldBeAdminOrPremium } = require("../middlewares/auth.middleware")
 
 const { UsersDAO } = require("../dao/mongo/users.dao")
 const usersDAO = new UsersDAO()
@@ -101,7 +101,7 @@ module.exports = () => {
     })
 
     // Vista de Carga de documentos para el USER
-    router.get("/upload-documents", /* userIsLoggedIn,*/(req, res) => {
+    router.get("/upload-documents", userIsLoggedIn, (req, res) => {
 
         const uid = req.session.user.id
         console.log("Informacion de sesion carga imagen =>", uid)
@@ -113,7 +113,7 @@ module.exports = () => {
     })
 
     // Vista de Carga de imagenes de productos
-    router.get("/upload-product-images/:pid", /* userIsLoggedIn, userShouldBeAdminOrPremium , */(req, res) => {
+    router.get("/upload-product-images/:pid", userIsLoggedIn, userShouldBeAdminOrPremium, (req, res) => {
 
         const pid = req.params.pid
         console.log("Informacion de products carga imagen =>", pid)

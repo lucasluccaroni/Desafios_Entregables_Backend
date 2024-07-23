@@ -39,7 +39,7 @@ module.exports = () => {
     })
 
     // Cargar un nuevo producto
-    router.post("/", /* userIsLoggedIn, userShouldBeAdminOrPremium, */ (req, res) => {
+    router.post("/", userIsLoggedIn, userShouldBeAdminOrPremium, (req, res) => {
         controller.addProduct(req, res)
     })
 
@@ -57,7 +57,7 @@ module.exports = () => {
 
 
     // Cargar imagenes de productos
-    router.post("/:pid/images", uploaderProducts.array("images", 2), async (req, res) => {
+    router.post("/:pid/images", userIsLoggedIn, userShouldBeAdminOrPremium, uploaderProducts.array("images", 2), async (req, res) => {
 
         await controller.uploadImages(req, res)
     })
