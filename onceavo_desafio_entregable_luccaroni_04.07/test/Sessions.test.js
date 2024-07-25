@@ -25,9 +25,9 @@ describe("TESTING SESSIONS", async () => {
 
     // Inicializacion e importacion de librerias.
     before(async () => {
-        chai = await import("chai");
-        expect = chai.expect;
-        requester = supertest("http://localhost:8080");
+        chai = await import("chai")
+        expect = chai.expect
+        requester = supertest("http://localhost:8080")
     })
 
     //- 1. register
@@ -37,11 +37,10 @@ describe("TESTING SESSIONS", async () => {
 
         expect(registerUser.status).to.equal(302)
 
-
     })
 
     //- 2. loging
-    it("Logging user, debe loggear correctamente + current", async () => {
+    it("Logging user, debe loggear correctamente + ir al endpoint current", async () => {
 
         const logging = await requester.post("/api/sessions/login")
             .send({
@@ -51,20 +50,15 @@ describe("TESTING SESSIONS", async () => {
 
         expect(logging.status).to.equals(302)
         expect(logging.headers['set-cookie']).to.exist
-        
-        
-        //2.  obtengo la info de sesion y la mando al current para devolver la info del usuario en el endpoint /current
+
+
+        //2. Obtengo la info de sesion y la mando al current para devolver la info del usuario en el endpoint /current
         const cookieResult = logging.headers["set-cookie"][0]
 
         const currentEndpoint = await requester.get("/api/sessions/current")
             .set("Cookie", [cookieResult])
-        
-        console.log(currentEndpoint)
-            expect(currentEndpoint.ok).to.be.true
-            expect(currentEndpoint._body.email).to.be.equals(mockUser.email)
 
-
-
+        expect(currentEndpoint.ok).to.be.true
+        expect(currentEndpoint._body.email).to.be.equals(mockUser.email)
     })
-
 }) 

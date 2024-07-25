@@ -16,7 +16,7 @@ module.exports = () => {
 
     const router = Router()
 
-
+    // CURRENT
     router.get("/current", userIsLoggedIn, async (req, res) => {
         req.logger.info("Info de session en Current: ", req.session.user)
         const idFromSession = req.session.user.id
