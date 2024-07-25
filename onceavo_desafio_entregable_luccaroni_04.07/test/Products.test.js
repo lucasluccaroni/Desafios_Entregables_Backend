@@ -3,6 +3,8 @@ const supertest = require("supertest")
 const mongoose = require("mongoose")
 const { ProductsDAO } = require("../src/dao/mongo/products.dao")
 
+// RECORDAR DUPLICAR CONSOLA. EN UNA ENCENDER LA APLICACIÓN - EN LA OTRA SE PRUEBAN LOS TESTS.
+
 
 describe("TESTING PRODUCTS", async () => {
 
@@ -33,7 +35,7 @@ describe("TESTING PRODUCTS", async () => {
         title: "mockProduct",
         description: "mockProduct",
         price: 999,
-        code: "fff999",
+        code: "aaa111",
         stock: 999,
         status: true,
         category: "mockProduct",
@@ -97,7 +99,6 @@ describe("TESTING PRODUCTS", async () => {
             .set("Cookie", [cookieResult])
             .send({ title: "Titulo cambiado" })
 
-        console.log(updateProduct)
 
         const updatedProductInDB = await productsDAO.getProductById(productId)
 
